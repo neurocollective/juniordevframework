@@ -1,0 +1,15 @@
+db/node_modules
+extension/node_modules
+job_runner/node_modules
+server/node_modules
+ui/node_modules
+lib/node_modules
+lib/package-lock.json
+ui/src/lib
+server/lib
+server/public
+job_runner/lib
+server/credentials.json
+server/token.json
+zGitStatus.sh
+zOpenVsCode.sh

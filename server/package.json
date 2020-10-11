@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest ./api_routes"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "cryptr": "^6.0.2",
+    "express": "^4.17.1",
+    "pg": "^8.3.3",
+    "redis": "^3.0.2"
+  },
+  "devDependencies": {
+    "jest": "^26.4.2"
+  }
+}

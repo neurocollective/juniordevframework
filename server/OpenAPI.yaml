@@ -1,0 +1,26 @@
+# TODO - this file is not yet complete
+
+openapi: 3.0.0
+info:
+  title: JuniorDevFramework API
+  description: REST endpoints for the juniordevframework
+  version: 0.1.9
+servers:
+  - url: https://juniordevframework.app
+    description: Deployed Instance (not yet active)
+  - url: http://localhost:8080
+    description: local instance, for single user or for development
+paths:
+  /oauth:
+    get:
+      summary: Route for OAuth callback
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        '200':
+          description: JSON describing success
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string

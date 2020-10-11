@@ -1,0 +1,5 @@
+{
+	"dbConnection": "postgresql://postgres:test@localhost:5432/postgres",
+	"tlsKeyPath": "/etc/letsencrypt/live/$DOMAIN_GOES_HERE/privkey.pem",
+	"tlsCertPath": "/etc/letsencrypt/live/$DOMAIN_GOES_HERE/fullchain.pem"
+}
