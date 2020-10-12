@@ -32,6 +32,7 @@ If you need to know more, raise an issue!
 #### Step One: Install `make` (windows && linux only, built-in on mac)
 
 windows: `choco install make`
+<br />
 linux: `sudo apt-get install build-essential -y`
 
 #### Step Two: Install Node via `nvm` (node version manager):
@@ -46,6 +47,7 @@ https://docs.docker.com/compose/install/
 #### Step Four: Clone this repo:
 
 ssh (recommended): `git clone git@github.com:neurocollective/juniordevframework.git`
+<br />
 https: `https://github.com/neurocollective/juniordevframework.git`
 
 #### Step Five: Get your gmail API key:
@@ -175,9 +177,9 @@ Why not?
 
 I just can't.
 
-# CoreContributors
+# Core Contributors
 
-(anyone with a merged PR will be added to this list)
+(anyone with a merged PR during the alpha will be added to this list)
 
 [neurocollective](https://github.com/neurocollective/)
 [jordanjmiller](https://github.com/jordanjmiller)

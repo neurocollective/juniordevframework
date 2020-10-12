@@ -23,6 +23,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 
 	const oAuthRouter = Router();
 
+	// this route MUST redirect, as browser is sent here from google. No vue app will be loaded to handle JSON
 	oAuthRouter.get('/', async (req, res) => {
 
 		const {
@@ -46,18 +47,16 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		}
 
 		if (error || !token || !token['access_token']) {
-			return res.status(500).json({
-				error: `token not retrieved! statusCode from google: ${statusCode}, error: ${requestError}`
-			});
+			const error = `token not retrieved! statusCode from google: ${statusCode}, error: ${requestError}`;
+			return res.redirect(`/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { statusCode, error: getProfileError, response } = await getGmailProfile(token['access_token']);
 
 		if (getProfileError || Number(statusCode) > 399) {
 			// still store token as orphaned? orphaned_oauth_token create-query exists
-			return res.status(500).json({
-				error: `/oauth got this error trying to use a newly issued token: ${getProfileError}`
-			});
+			const error = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
+			return res.redirect(`/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { emailAddress } = response;
@@ -66,7 +65,8 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 
 		if (getProfileError || !user) {
 			// still store token as orphaned? orphaned_oauth_token create-query exists
-			return res.status(500).json({ error: `/oauth found no user for email ${emailAddress}` });
+			const error = `/oauth found no user for email ${emailAddress}`;
+			return res.redirect(`/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { id } = user;
@@ -79,11 +79,12 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 			try {
 				await dbFunctions.insertToken(token, id, now);
 			} catch (err) {
-				console.error('/oauth error trying to insertToken:', err);
-				return res.status(500).send(err.message);
+				const error = `/oauth error trying to insertToken:' ${err.message}`;
+				console.error(error);
+				return res.redirect(`/?error=${encodeURIComponent(error)}`);
 			}
 		} else {
-			await dbFunctions.updateTokenValueForUser(token, id);	
+			await dbFunctions.updateTokenValueForUser(token, id);
 		}
 
 		const cookieValue = uuid();
@@ -95,52 +96,8 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 			console.error('error setting key/value in redis:', err);
 		}
 
-		return res.redirect('/');
+		return res.redirect('/authorized=true');
 	});
-
-	// oAuthRouter.post('/login', async (req, res) => {
-	// 	console.log("SLASH LOGIN DAWG");
-	// 	const {
-	// 		body: {
-	// 			email
-	// 		}
-	// 	} = req;
-
-	// 	const { rows: [user] } = await dbFunctions.getUserIdForEmail(email);
-
-	// 	if (!user) {
-	// 		const error = 'no user for that email';
-			
-	// 		if (REDIRECT_AUTH_URLS) {
-	// 			return res.redirect(`/?code=401&error=${error.split(' ').join('+')}`);
-	// 		}
-	// 		return res.status(401).json({ error });
-	// 	}
-
-	// 	const { id } = user;
-
-	// 	// db has a constraint on oauth_token that userId is UNIQUE
-	// 	const { rows: [token] } = await dbFunctions.getOAuthTokenForUserId(id);
-
-	// 	const tokenIsExpired = await isTokenExpiredByAPICheck(token);
-
-	// 	if (tokenIsExpired) {
-
-	// 		const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
-
-	// 		if (REDIRECT_AUTH_URLS) {
-	// 			return res.redirect(authURL);
-	// 		}
-	// 		const json = { [REDIRECT_URL]: authURL };
-	// 		console.log('sending back json', json);
-	// 		return res.json(json);
-	// 	}
-			
-	// 	if (REDIRECT_AUTH_URLS) {
-	// 		return res.redirect('/?loggedin=true');
-	// 	}
-	// 	return res.status(200).json({ authorized: true }); 
-	// });
 
 	return oAuthRouter;
 };

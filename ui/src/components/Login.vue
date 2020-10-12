@@ -46,8 +46,17 @@ export default {
     onSubmit() {
       // console.log('onSubmit, email is:', this.email);
 
-      const onJson = (/* statusCode, ok, json */) => {
-        // not needed?
+      const onJson = (statusCode, ok, json) => {
+        console.log('Login\'s onJson');
+        if (!ok) {
+          console.log(json.error);
+          // TODO - send error message to store so we can display message in UI
+        }
+
+        if (json.authorized) {
+          console.log('authorized');
+          // redirect to home?
+        }
       };
 
       const fetchOptions = {
@@ -70,16 +79,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .todos-container {
-  }
-
-  .todo-container {
-    border: 1px solid black;
-    border-radius: 5px;
-    max-width: 50%;
-    margin: 5px auto;
-    padding: 10px;
-/*    display: flex;
-    justify-content: center;*/
-  }
+  .login-container {}
 </style>

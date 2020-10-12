@@ -1,4 +1,5 @@
 vue:
+	make library
 	npm run serve --prefix ./ui
 redis:
 	docker run --name junior_dev_framework_dev_redis -p 6379:6379 -d redis  
@@ -23,9 +24,9 @@ test:
 	# npm t --prefix ./server
 	# npm run test:unit  --prefix ./ui
 serve:
+	make library
 	LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
 library:
-	# this should leave out non .js files in the future, and any node_modules
 	cp -r ./lib/ ./server/
 	cp -r ./lib/ ./ui/src/
 	cp -r ./lib/ ./job_runner/
@@ -38,7 +39,6 @@ install:
 	npm i --prefix ./job_runner
 	npm i --prefix ./lib # only installs jest TODO - can we remove dependencies and package.json from /lib?
 	make library
-#   npm i --prefix ./extension
 images:
 	docker build -t junior_dev_framework_server:latest ./server
 backend:
