@@ -67,16 +67,17 @@
 <script>
   import router from './router';
   import CONSTANTS from './lib/constants';
-  import { fetchJSON, adjustStateToLoadingPath } from './lib';
+  import { buildFetchJsonOrRedirect } from './utils';
+  import { adjustStateToLoadingPath } from './lib';
 
   const {
     UI_CONSTANTS,
-    MIDDLEWARE: {
-      REDIRECT_URL
-    },
-    ROUTING: {
-      SLASH_LOGIN
-    }
+    // MIDDLEWARE: {
+    //   REDIRECT_URL
+    // },
+    // ROUTING: {
+    //   SLASH_LOGIN
+    // }
   } = CONSTANTS;
 
   const {
@@ -97,27 +98,17 @@
 
       adjustStateToLoadingPath(this.$store.dispatch);
 
-      const [statusCode, ok, json] = await fetchJSON('http://localhost:3000/api/pageload');
+      // const onJson = (statusCode, ok, json) => {
+      //   const payload = { json, statusCode };
+      //   const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
+      //   return this.$store.dispatch({ type, payload });
+      // };
 
-      const {
-        [REDIRECT_URL]: redirectURL
-      } = json;
-
-      if (redirectURL) {
-        // putting in a switch in case we want other routing options later.
-        // If SLASH_LOGIN turns out to be the only option needed, this can refactor
-        switch (redirectURL) {
-          case SLASH_LOGIN:
-          console.log('REDIRECTING TO', SLASH_LOGIN);
-            return this.$store.dispatch('goToLogin');
-          default:
-            // do nada
-        }
-      }
-
-      const payload = { json, statusCode };
-      const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
-      return this.$store.dispatch({ type, payload });
+      const fetchOptions = {
+        url: 'http://localhost:3000/api/pageload', // TODO - make this URL dynamic
+        onJson: this.onPageLoadJson
+      };
+      await this.fetchJsonOrRedirect(fetchOptions);
     },
     computed: {
       router() {
@@ -141,9 +132,18 @@
       }
     },
     methods: {
+      onPageLoadJson(statusCode, ok, json) {
+        const payload = { json, statusCode };
+        const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
+        return this.$store.dispatch({ type, payload });
+      },
       // handleClick() {
       //   console.log('clicky');
       // },
+      fetchJsonOrRedirect(options) {
+        const builtFunction = buildFetchJsonOrRedirect(this.$store.dispatch);
+        return builtFunction(options);
+      },
       toggleMenu() {
         this.$store.dispatch('toggleMenu');
       },

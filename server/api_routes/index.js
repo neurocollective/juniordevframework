@@ -1,4 +1,12 @@
 const { Router } = require('express');
+const {
+  ROUTING: {
+    SLASH_LOGIN,
+    SLASH_OAUTH,
+    SLASH_PAGELOAD,
+    SLASH_USER
+  }
+} = require('../../lib/constants');
 
 // const loginRoutes = require('./login');
 // const pageLoadRoutes = require('./pageload');
@@ -29,16 +37,16 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
   // apiRouter.use(globalMiddleware);
 
   const loginRoutes = getLoginRoutes(postgresFunctions, redisFunctions, credentialsObject);
-  apiRouter.use('/login', loginRoutes);
+  apiRouter.use(SLASH_LOGIN, loginRoutes);
 
   const oauthRoutes = getOAuthRoutes(postgresFunctions, redisFunctions, credentialsObject);
-  apiRouter.use('/oath', oauthRoutes);
+  apiRouter.use(SLASH_OAUTH, oauthRoutes);
   
   const pageLoadRoutes = getPageLoadRoutes(postgresFunctions, redisFunctions, credentialsObject);
-  apiRouter.use('/pageload', authMiddleware, pageLoadRoutes);
+  apiRouter.use(SLASH_PAGELOAD, authMiddleware, pageLoadRoutes);
 
   const userRoutes = getUserRoutes(postgresFunctions, redisFunctions, credentialsObject);
-  apiRouter.use('/user', userRoutes);
+  apiRouter.use(SLASH_USER, userRoutes);
 
   // check values for given keys in redis
   if (local) {

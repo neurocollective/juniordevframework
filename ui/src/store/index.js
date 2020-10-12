@@ -15,7 +15,16 @@ const {
   ACTION_TYPES: {
     LOAD_PAGE_DATA_SUCCESS,
     LOAD_PAGE_DATA_ERROR,
-    CHANGE_ROUTE
+    CHANGE_ROUTE,
+    TOGGLE_MENU,
+    GO_TO_CONTACTS,
+    GO_TO_TODOS,
+    GO_TO_RESULTS,
+    GO_TO_ACCOUNT,
+    GO_TO_LOGIN,
+    GO_TO_SIGNUP,
+    INCREMENT_PAGE_COUNT,
+    GO_HOME
   }
 } = UI_CONSTANTS;
 
@@ -63,48 +72,48 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    incrementPageCount: function({ commit }) {
+    [INCREMENT_PAGE_COUNT]: function({ commit }) {
       commit('incrementPage');
     },
     [CHANGE_ROUTE]: function({ commit }, { destination }) {
       console.log(`changing routes to ${destination}`);
       commit({ type: 'setPageRoute', destination });
     },
-    toggleMenu({ commit }) {
+    [TOGGLE_MENU]: function({ commit }) {
       commit({ type: 'toggleMenu' });
     },
-    goHome({ dispatch }) {
+    [GO_HOME]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(HOME)))
         .catch(handleRoutingError);
     },
-    goToAccount({ dispatch }) {
+    [GO_TO_ACCOUNT]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(ACCOUNT)))
         .catch(handleRoutingError);
     },
-    goToResults({ dispatch }) {
+    [GO_TO_RESULTS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(RESULTS)))
         .catch(handleRoutingError);
     },
-    goToToDos({ dispatch }) {
+    [GO_TO_TODOS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(TODOS)))
         .catch(handleRoutingError);
     },
-    goToContacts({ dispatch }) {
+    [GO_TO_CONTACTS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(CONTACTS)))
         .catch(handleRoutingError);
     },
-    goToLogin({ dispatch }) {
+    [GO_TO_LOGIN]: function({ dispatch }) {
       console.log('goToLogin inside store');
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(LOGIN)))
         .catch(handleRoutingError);
     },
-    goToSignup({ dispatch }) {
+    [GO_TO_SIGNUP]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(SIGNUP)))
         .catch(handleRoutingError);

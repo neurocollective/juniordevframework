@@ -6,6 +6,11 @@ const {
 	isTokenExpiredByAPICheck,
 	getAuthUrlFromCredentials
 } = require('../../lib');
+const {
+	MIDDLEWARE: {
+		REDIRECT_URL
+	}
+} = require('../../lib/constants');
 const  {
   env: {
     REDIRECT_AUTH_URLS: redirectEnvValue = ''
@@ -93,47 +98,49 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		return res.redirect('/');
 	});
 
-	oAuthRouter.post('/login', async (req, res) => {
+	// oAuthRouter.post('/login', async (req, res) => {
+	// 	console.log("SLASH LOGIN DAWG");
+	// 	const {
+	// 		body: {
+	// 			email
+	// 		}
+	// 	} = req;
 
-		const {
-			body: {
-				email
-			}
-		} = req;
+	// 	const { rows: [user] } = await dbFunctions.getUserIdForEmail(email);
 
-		const { rows: [user] } = await dbFunctions.getUserIdForEmail(email);
-
-		if (!user) {
-			const error = 'no user for that email';
+	// 	if (!user) {
+	// 		const error = 'no user for that email';
 			
-			if (REDIRECT_AUTH_URLS) {
-				return res.redirect(`/?code=401&error=${error.split(' ').join('+')}`);
-			}
-			return res.status(401).json({ error });
-		}
+	// 		if (REDIRECT_AUTH_URLS) {
+	// 			return res.redirect(`/?code=401&error=${error.split(' ').join('+')}`);
+	// 		}
+	// 		return res.status(401).json({ error });
+	// 	}
 
-		const { id } = user;
+	// 	const { id } = user;
 
-		// db has a constraint on oauth_token that userId is UNIQUE
-		const { rows: [token] } = await dbFunctions.getOAuthTokenForUserId(id);
+	// 	// db has a constraint on oauth_token that userId is UNIQUE
+	// 	const { rows: [token] } = await dbFunctions.getOAuthTokenForUserId(id);
 
-		const tokenIsExpired = await isTokenExpiredByAPICheck(token);
+	// 	const tokenIsExpired = await isTokenExpiredByAPICheck(token);
 
-		if (tokenIsExpired) {
+	// 	if (tokenIsExpired) {
 
-			const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
+	// 		const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
 
-			if (REDIRECT_AUTH_URLS) {
-				return res.redirect(authURL);
-			}
-			return res.json({ authURL });
-		}
+	// 		if (REDIRECT_AUTH_URLS) {
+	// 			return res.redirect(authURL);
+	// 		}
+	// 		const json = { [REDIRECT_URL]: authURL };
+	// 		console.log('sending back json', json);
+	// 		return res.json(json);
+	// 	}
 			
-		if (REDIRECT_AUTH_URLS) {
-			return res.redirect('/?loggedin=true');
-		}
-		return res.status(200).json({ authorized: true }); 
-	});
+	// 	if (REDIRECT_AUTH_URLS) {
+	// 		return res.redirect('/?loggedin=true');
+	// 	}
+	// 	return res.status(200).json({ authorized: true }); 
+	// });
 
 	return oAuthRouter;
 };

@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { buildFetchJsonOrRedirect } from '../utils';
+
 export default {
   name: 'login',
   computed: {
@@ -28,8 +30,12 @@ export default {
     return { email: '' };
   },
   methods: {
-    navigateToSignUp() {
-      this.$store.dispatch('goToSignup');
+    // navigateToSignUp() {
+    //   this.$store.dispatch('goToSignup');
+    // },
+    fetchJsonOrRedirect(fetchOptions) {
+      const builtFunction = buildFetchJsonOrRedirect(this.$store.dispatch);
+      return builtFunction(fetchOptions);
     },
     // goToLogin() {
     //   this.$store.dispatch('goToLogin');
@@ -38,7 +44,25 @@ export default {
       this.$store.dispatch('goToSignup');
     },
     onSubmit() {
-      console.log('onSubmit, email is:', this.email);
+      // console.log('onSubmit, email is:', this.email);
+
+      const onJson = (/* statusCode, ok, json */) => {
+        // not needed?
+      };
+
+      const fetchOptions = {
+        url: 'http://localhost:3000/api/login',
+        method: 'POST',
+        body: JSON.stringify({
+          email: this.email
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        onJson
+      };
+      this.fetchJsonOrRedirect(fetchOptions);
     }
   }
 };
