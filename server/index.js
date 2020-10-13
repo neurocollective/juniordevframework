@@ -75,6 +75,7 @@ if (useTLS) {
 const bootServer = async () => {
 
   const { rows: [credentials] } = await postgresFunctions.getCredentials();
+  console.log('credentials', credentials);
 
   // parsing middleware
   // TODO - this could be more targeted in middleware/index.js? Avoiding unnecessary middleware could give small performance boost

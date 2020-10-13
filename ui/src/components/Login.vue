@@ -20,7 +20,7 @@
 import { buildFetchJsonOrRedirect } from '../utils';
 
 export default {
-  name: 'login',
+  name: 'Login',
   computed: {
     userJobListings() {
       return this.$store.state.userJobListings;

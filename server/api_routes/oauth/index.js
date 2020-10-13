@@ -26,6 +26,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 	// this route MUST redirect, as browser is sent here from google. No vue app will be loaded to handle JSON
 	oAuthRouter.get('/', async (req, res) => {
 
+		console.log('/api/oauth');
 		const {
 			query: {
 				code,
@@ -76,6 +77,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		const { rows: [existingToken] } = await dbFunctions.getOAuthTokenForUserId(id);
 
 		if (!existingToken) {
+			console.log('inserting token');
 			try {
 				await dbFunctions.insertToken(token, id, now);
 			} catch (err) {
@@ -84,6 +86,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 				return res.redirect(`/?error=${encodeURIComponent(error)}`);
 			}
 		} else {
+			console.log('updating token');
 			await dbFunctions.updateTokenValueForUser(token, id);
 		}
 
@@ -96,7 +99,8 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 			console.error('error setting key/value in redis:', err);
 		}
 
-		return res.redirect('/authorized=true');
+		console.log('sending user to /?authorized=true');
+		return res.redirect('/?authorized=true');
 	});
 
 	return oAuthRouter;

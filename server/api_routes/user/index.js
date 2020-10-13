@@ -28,6 +28,11 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 			}
 		} = req;
 
+		console.log('sent:', email, firstName, lastName);
+		if (!email) {
+			return res.status(500).json({ error: 'email required' });
+		}
+
 		let userId;
 		try {
 			const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
