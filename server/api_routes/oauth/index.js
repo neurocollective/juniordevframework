@@ -9,6 +9,10 @@ const {
 const {
 	MIDDLEWARE: {
 		REDIRECT_URL
+	},
+	COOKIES: {
+		KEY: COOKIE_KEY,
+		COOKIE_MAX_AGE
 	}
 } = require('../../lib/constants');
 const  {
@@ -49,7 +53,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 
 		if (error || !token || !token['access_token']) {
 			const error = `token not retrieved! statusCode from google: ${statusCode}, error: ${requestError}`;
-			return res.redirect(`/?error=${encodeURIComponent(error)}`);
+			return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { statusCode, error: getProfileError, response } = await getGmailProfile(token['access_token']);
@@ -57,7 +61,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		if (getProfileError || Number(statusCode) > 399) {
 			// still store token as orphaned? orphaned_oauth_token create-query exists
 			const error = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
-			return res.redirect(`/?error=${encodeURIComponent(error)}`);
+			return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { emailAddress } = response;
@@ -67,7 +71,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		if (getProfileError || !user) {
 			// still store token as orphaned? orphaned_oauth_token create-query exists
 			const error = `/oauth found no user for email ${emailAddress}`;
-			return res.redirect(`/?error=${encodeURIComponent(error)}`);
+			return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
 		}
 
 		const { id } = user;
@@ -83,7 +87,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 			} catch (err) {
 				const error = `/oauth error trying to insertToken:' ${err.message}`;
 				console.error(error);
-				return res.redirect(`/?error=${encodeURIComponent(error)}`);
+				return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
 			}
 		} else {
 			console.log('updating token');
@@ -91,7 +95,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		}
 
 		const cookieValue = uuid();
-		res.setCookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
+		res.cookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
 		
 		try {
 			await redisFunctions.mapCookieAndUserId(cookieValue, userId);
@@ -100,7 +104,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 		}
 
 		console.log('sending user to /?authorized=true');
-		return res.redirect('/?authorized=true');
+		return res.redirect('http://localhost:8080/?authorized=true');
 	});
 
 	return oAuthRouter;

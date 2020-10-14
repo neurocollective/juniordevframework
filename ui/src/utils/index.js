@@ -23,7 +23,8 @@ export const buildFetchJsonOrRedirect = (dispatch) => async (fetchOptions) => {
 
   // set defaults?
   const options = {
-    ...fetchOptions
+    ...fetchOptions,
+    credentials: 'include' // send cookies the browser has for the domain
   };
 
   const response = await fetch(url, options);
