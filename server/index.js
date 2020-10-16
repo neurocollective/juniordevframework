@@ -86,7 +86,7 @@ const bootServer = async () => {
   if (!local) {
     app.use('/', express.static('public'));
   } else {
-    app.use(cors());
+    app.use(cors({ origin: 'http://localhost:3000' }));
   }
 
   // console.log(postgresFunctions);

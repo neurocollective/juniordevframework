@@ -134,6 +134,7 @@
     methods: {
       onPageLoadJson(statusCode, ok, json) {
         const payload = { json, statusCode };
+        console.log(statusCode, ok, json);
         const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
         return this.$store.dispatch({ type, payload });
       },
