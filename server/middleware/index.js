@@ -56,7 +56,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 		if (local) {
 			console.log('no userId found by checkForValidSession, sending redirect');
 		}
-		return res.json({ [REDIRECT_URL]: SLASH_LOGIN });
+		return res.status(304).json({ [REDIRECT_URL]: SLASH_LOGIN });
 	};
 
 	const checkForValidToken = async (req, res, next) => {
@@ -92,7 +92,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 		}
 		const redirectURL = getAuthUrlFromCredentials(credentialsObject, id, email);
 
-		return res.json({ [REDIRECT_URL]: redirectURL });
+		return res.status(304).json({ [REDIRECT_URL]: redirectURL });
 	};
 
 	return [

@@ -86,7 +86,13 @@ const bootServer = async () => {
   if (!local) {
     app.use('/', express.static('public'));
   } else {
-    app.use(cors({ origin: 'http://localhost:3000' }));
+    const corsOptions = { origin: ['http://localhost:8080', 'http://localhost:3000'] };
+    const corsMiddleware = cors(corsOptions);
+    const corsMiddlewareWithAllowCredentials = (req, res, next) => {
+      res.set('Access-Control-Allow-Credentials', 'true'); // required for cross-origin cookie transfer, on client side
+      corsMiddleware(req, res, next);
+    };
+    app.use(corsMiddlewareWithAllowCredentials);
   }
 
   // console.log(postgresFunctions);
