@@ -183,5 +183,5 @@ I just can't.
 
 (anyone with a merged PR will be added to this list)
 
-neurocollective
-jordanjmiller
+[neurocollective](https://github.com/neurocollective)
+[jordanjmiller](https://github.com/jordanjmiller)
