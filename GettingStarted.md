@@ -4,7 +4,7 @@ Hello! Here's a list of resources to help you learn frameworks/dependencies used
 
 Docker allows all of our code, including all dependencies, to be 'containerized'. This makes sure that the code has everything it needs to run, and can run in it's own little bubble like a Virtual Machine (but without the overhead.)
 
-Learn more about it/how te get started with it below!
+Learn more about/how to get started with it below!
 
 https://www.freecodecamp.org/news/the-docker-handbook/#introduction-to-containerization-and-docker
 
