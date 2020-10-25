@@ -37,7 +37,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 	// const { getUserIdForCookie, mapCookieAndUserId } = redisFunctions;
 
 	const checkForValidSession = async (req, res, next) => {
-
+		console.log('checkForValidSession');
 		const {
 			cookies: {
 				[SESSION_KEY]: cookieValue
@@ -50,17 +50,17 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 
 		if (req.cookies[SESSION_KEY]) {
 			const userId = await redisFunctions.getUserIdForCookie(cookieValue);
-			req.userId = userId;
+			req[USER_ID] = userId;
 			return next();
 		}
 		if (local) {
 			console.log('no userId found by checkForValidSession, sending redirect');
 		}
-		return res.status(304).json({ [REDIRECT_URL]: SLASH_LOGIN });
+		return res.status(200).json({ [REDIRECT_URL]: SLASH_LOGIN });
 	};
 
 	const checkForValidToken = async (req, res, next) => {
-
+		console.log('checkForValidToken');
 		req.validToken = false;
 		const { [USER_ID]: userId } = req;
 
@@ -69,7 +69,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 			if (local) {
 				console.log('no userId in checkForValidToken, sending redirect');
 			}
-			return res.json({ [REDIRECT_URL]: SLASH_LOGIN });
+			return res.status(401).json({ [REDIRECT_URL]: SLASH_LOGIN });
 		}
 
 		let tokenObject;
@@ -77,7 +77,10 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 			tokenObject = await postgresFunctions.getTokenForUserId(userId);
 		} catch (err) {
 			console.error(`checkForValidToken got error ${err.message}`);
-			return next();
+
+			const { rows: [{ email }] } = await getEmailForUserId(userId);
+			const redirectURL = getAuthUrlFromCredentials(credentialsObject, userId, email);
+			return res.status(401).json({ [REDIRECT_URL]: redirectURL });
 		}
 
 		const tokenIsValid = await isTokenExpiredByAPICheck(tokenObject);
@@ -90,9 +93,9 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
 		if (local) {
 			console.log('invalid token in checkForValidToken, sending redirect');
 		}
-		const redirectURL = getAuthUrlFromCredentials(credentialsObject, id, email);
-
-		return res.status(304).json({ [REDIRECT_URL]: redirectURL });
+		const { rows: [{ email }] } = await getEmailForUserId(userId);
+		const redirectURL = getAuthUrlFromCredentials(credentialsObject, userId, email);
+		return res.status(401).json({ [REDIRECT_URL]: redirectURL });
 	};
 
 	return [

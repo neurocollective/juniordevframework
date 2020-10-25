@@ -8,6 +8,9 @@
         <button @click="onSubmit">Login</button>
       </div>
     </div>
+    <div v-if="this.loginError" class="login-error">
+      {{ this.loginError }}
+    </div>
     <div>
        <span>No account?</span>
        &nbsp;
@@ -18,12 +21,22 @@
 
 <script>
 import { buildFetchJsonOrRedirect } from '../utils';
+import { UI_CONSTANTS } from '../lib/constants';
+
+const {
+  ACTION_TYPES: {
+    LOGIN_ERROR
+  }
+} = UI_CONSTANTS;
 
 export default {
   name: 'Login',
   computed: {
     userJobListings() {
       return this.$store.state.userJobListings;
+    },
+    loginError() {
+      return this.$store.state.loginError;
     }
   },
   data: function() {
@@ -47,15 +60,15 @@ export default {
       // console.log('onSubmit, email is:', this.email);
 
       const onJson = (statusCode, ok, json) => {
-        console.log('Login\'s onJson');
+        // console.log('Login\'s onJson');
         if (!ok) {
-          console.log(json.error);
-          // TODO - send error message to store so we can display message in UI
+          // console.log('Login.onJSON error:', json.error);
+          const payload = { json };
+          this.$store.dispatch({ type: LOGIN_ERROR, payload });
         }
 
         if (json.authorized) {
-          console.log('authorized');
-          // redirect to home?
+          this.$store.dispatch('goToHome');
         }
       };
 
@@ -79,5 +92,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .login-container {}
+  .login-container {
+
+  }
+  .login-error {
+    color: red;
+  }
 </style>

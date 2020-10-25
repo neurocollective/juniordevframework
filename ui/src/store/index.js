@@ -24,7 +24,8 @@ const {
     GO_TO_LOGIN,
     GO_TO_SIGNUP,
     INCREMENT_PAGE_COUNT,
-    GO_HOME
+    GO_HOME,
+    LOGIN_ERROR
   }
 } = UI_CONSTANTS;
 
@@ -45,7 +46,8 @@ export default new Vuex.Store({
     count: 0,
     showMenu: false,
     pageLoadError: null,
-    pageLoadData: {}
+    pageLoadData: {},
+    loginError: ''
   },
   mutations: {
     incrementPage(state) {
@@ -53,7 +55,6 @@ export default new Vuex.Store({
     },
     setPageRoute(state, payload) {
       const { destination } = payload;
-
       state.currentComponent = destination;
       const { page } = state;
       window.history.pushState({ page }, `title${page}`, `/${destination}`);
@@ -65,10 +66,14 @@ export default new Vuex.Store({
     setPageLoadError(state, err) {
       state.pageLoadError = err;
     },
-    setPageLoadData(state, { payload }) {
-      console.log('payload.json.data:', payload.json.data);
+    setPageLoadData(state, { payload = {} }) {
+      const { json: { data } = {} } = payload;
       state.pageLoadData = payload;
-      state.userJobListings = payload.json.data;
+      state.userJobListings = data;
+    },
+    setLoginError(state, error) {
+      console.log('setLoginError error', error);
+      state.loginError = error;
     }
   },
   actions: {
@@ -118,14 +123,22 @@ export default new Vuex.Store({
         .then(() => dispatch(getRouteChangeAction(SIGNUP)))
         .catch(handleRoutingError);
     },
-    [LOAD_PAGE_DATA_SUCCESS]: function({ commit }, payload) {
-      console.log(`store has ${LOAD_PAGE_DATA_SUCCESS}`);
+    [LOAD_PAGE_DATA_SUCCESS]: function({ commit }, payload = {}) {
       commit('setPageLoadData', payload);
     },
-    [LOAD_PAGE_DATA_ERROR]: function({ commit }, payload) {
+    [LOAD_PAGE_DATA_ERROR]: function({ commit }, payload = {}) {
       const { json: { error = 'data failed to load' } = {} } = payload;
-      console.log(`store has ${LOAD_PAGE_DATA_ERROR}, error is ${error}`);
       commit('setPageLoadError', error);
+    },
+    [LOGIN_ERROR]: function({ commit }, action = {}) {
+      const {
+        payload: {
+          json: {
+            error
+          } = {}
+        } = {}
+      } = action;
+      commit('setLoginError', error);
     }
   },
   modules: {

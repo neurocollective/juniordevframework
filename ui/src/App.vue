@@ -83,7 +83,13 @@
   const {
     ACTION_TYPES: {
       LOAD_PAGE_DATA_SUCCESS,
-      LOAD_PAGE_DATA_ERROR
+      LOAD_PAGE_DATA_ERROR,
+      GO_HOME,
+      GO_TO_ACCOUNT,
+      GO_TO_RESULTS,
+      GO_TO_TODOS,
+      GO_TO_CONTACTS,
+      TOGGLE_MENU
     },
     APP_NAME
   } = UI_CONSTANTS;
@@ -127,46 +133,41 @@
         return this.$store.state.pageLoadError;
       },
       pageLoadData() {
-        console.log('pageLoadData:', this.$store.state.pageLoadData);
         return this.$store.state.pageLoadData;
       }
     },
     methods: {
       onPageLoadJson(statusCode, ok, json) {
         const payload = { json, statusCode };
-        console.log(statusCode, ok, json);
         const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
         return this.$store.dispatch({ type, payload });
       },
-      // handleClick() {
-      //   console.log('clicky');
-      // },
       fetchJsonOrRedirect(options) {
         const builtFunction = buildFetchJsonOrRedirect(this.$store.dispatch);
         return builtFunction(options);
       },
       toggleMenu() {
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToHome() {
-        this.$store.dispatch('goHome');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_HOME);
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToAccount() {
-        this.$store.dispatch('goToAccount');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_ACCOUNT);
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToResults() {
-        this.$store.dispatch('goToResults');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_RESULTS);
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToToDos() {
-        this.$store.dispatch('goToToDos');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_TODOS);
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToContacts() {
-        this.$store.dispatch('goToContacts');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_CONTACTS);
+        this.$store.dispatch(TOGGLE_MENU);
       },
       // goToLogin() {
       //   this.$store.dispatch('goToLogin');
@@ -188,7 +189,5 @@
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-/*    text-align: center;
-    color: #2c3e50;*/
   }
 </style>
