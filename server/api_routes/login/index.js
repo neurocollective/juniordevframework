@@ -52,7 +52,7 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
       if (REDIRECT_AUTH_URLS) {
         return res.redirect(authURL);
       }
-      return res.json({ [REDIRECT_URL]: authURL });
+      return res.status(401).json({ [REDIRECT_URL]: authURL });
     }
       
     if (REDIRECT_AUTH_URLS) {

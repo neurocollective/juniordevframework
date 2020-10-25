@@ -34,7 +34,6 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
   const apiRouter = Router();
 
   const authMiddleware = buildAuthMiddleware(postgresFunctions, redisFunctions, credentialsObject);
-  // apiRouter.use(globalMiddleware);
 
   const loginRoutes = getLoginRoutes(postgresFunctions, redisFunctions, credentialsObject);
   apiRouter.use(SLASH_LOGIN, loginRoutes);
@@ -50,28 +49,55 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
 
   // check values for given keys in redis
   if (local) {
-    apiRouter.get('/redis/get/:key', async (req, res) => {
+
+    const redisRouter = Router();
+
+    redisRouter.get('/get/:key', async (req, res) => {
       const {
         params: {
           key
-        }
+        } = {}
       } = req;
 
-      const value = await redisFunctions.getValueForKey(key);
+      let value;
+      try {
+        value = await redisFunctions.getValueForKey(key);
+      } catch (err) {
+        console.error(err);
+        return res.json({ error: 'ruh roh' });
+      }
       return res.json({ [key]: value });
     });
 
-    apiRouter.get('/redis/set/:key/:value', async (req, res) => {
+    redisRouter.get('/set/:key/:value', async (req, res) => {
       const {
         params: {
           key,
           value
-        }
+        } = {}
       } = req;
 
-      await redisFunctions.setKeyValue(key, value);
+      try {
+        await redisFunctions.setKeyValue(key, value);
+      } catch (err) {
+        console.error(err);
+        return res.json({ error: 'ruh roh' });        
+      }
       return res.json({ [key]: value });
     });
+
+    redisRouter.get('/all', async (req, res) => {
+      let keys = null;
+      try {
+        keys = await redisFunctions.getAllKeys();
+      } catch (err) {
+        console.error('err', err);
+        return res.json({ error: 'ruh roh' });        
+      }
+      return res.json({ allKeys: keys });
+    });
+
+    apiRouter.use('/redis', redisRouter);
   }
 
   return apiRouter;

@@ -147,26 +147,33 @@
         return builtFunction(options);
       },
       toggleMenu() {
+        // console.log('toggleMenu firing');
         this.$store.dispatch(TOGGLE_MENU);
+        // this.showMenu = !(this.showMenu);
       },
       goToHome() {
         this.$store.dispatch(GO_HOME);
+        // this.toggleMenu();
         this.$store.dispatch(TOGGLE_MENU);
       },
       goToAccount() {
         this.$store.dispatch(GO_TO_ACCOUNT);
+        // this.toggleMenu();
         this.$store.dispatch(TOGGLE_MENU);
       },
       goToResults() {
         this.$store.dispatch(GO_TO_RESULTS);
+        // this.toggleMenu();
         this.$store.dispatch(TOGGLE_MENU);
       },
       goToToDos() {
         this.$store.dispatch(GO_TO_TODOS);
+        // this.toggleMenu();
         this.$store.dispatch(TOGGLE_MENU);
       },
       goToContacts() {
         this.$store.dispatch(GO_TO_CONTACTS);
+        // this.toggleMenu();
         this.$store.dispatch(TOGGLE_MENU);
       },
       // goToLogin() {
@@ -178,7 +185,8 @@
     },
     data() {
       return {
-        appName: APP_NAME
+        appName: APP_NAME,
+        // showMenu: false,
       };
     }
   };
