@@ -149,17 +149,13 @@ NO! Don't let the natural disorientation of a new codebase intimidate you, or im
 
 Other than installing docker, you don't need to know much about docker, redis, or postgres at all. Most of the implementation details of these tech is taken care of and abstracted away. Don't let it scare you away!
 
+Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
+
 - I don't know vue.js. How do I learn it?
 
 I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up. 
 
-If you like educational resources...
-
-https://www.codecademy.com/learn/learn-vue-js
-
-https://vuejs.org/
-
-https://learnvue.co/
+Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
 
 - How do I make a Pull Request when I am totally lost?
 
@@ -187,5 +183,5 @@ I just can't.
 
 (anyone with a merged PR will be added to this list)
 
-neurocollective
-jordanjmiller
+[neurocollective](https://github.com/neurocollective)
+[jordanjmiller](https://github.com/jordanjmiller)
