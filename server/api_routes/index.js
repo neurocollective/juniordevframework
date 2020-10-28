@@ -69,6 +69,23 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
       return res.json({ [key]: value });
     });
 
+    redisRouter.get('/ttl/:key', async (req, res) => {
+      const {
+        params: {
+          key
+        } = {}
+      } = req;
+
+      let ttl;
+      try {
+        ttl = await redisFunctions.getTTLForKey(key);
+      } catch (err) {
+        console.error(err);
+        return res.json({ error: 'ruh roh' });
+      }
+      return res.json({ ttl });
+    });
+
     redisRouter.get('/set/:key/:value', async (req, res) => {
       const {
         params: {
