@@ -6,7 +6,8 @@ const  {
 } = process;
 const {
   isTokenExpiredByAPICheck,
-  getAuthUrlFromCredentials
+  getAuthUrlFromCredentials,
+  getAuthURLAndSendRedirectJSON
 } = require('../../lib');
 const {
   MIDDLEWARE: {
@@ -45,14 +46,28 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 
     const tokenIsExpired = await isTokenExpiredByAPICheck(token);
 
+    // if (tokenIsExpired) {
+
+    //   const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
+
+    //   if (REDIRECT_AUTH_URLS) {
+    //     return res.redirect(authURL);
+    //   }
+    //   return res.status(401).json({ [REDIRECT_URL]: authURL });
+    // }
+
+    // const getAuthURLAndSendRedirectJSON = (res, contextObject, statusCode = 401) => {
+    //   const { credentialsObject, id, email } = contextObject;
+    //   const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
+    //   if (REDIRECT_AUTH_URLS) {
+    //     return res.redirect(authURL);
+    //   }
+    //   return res.status(statusCode).json({ [REDIRECT_URL]: authURL });
+    // }
+
     if (tokenIsExpired) {
-
-      const authURL = getAuthUrlFromCredentials(credentialsObject, id, email);
-
-      if (REDIRECT_AUTH_URLS) {
-        return res.redirect(authURL);
-      }
-      return res.status(401).json({ [REDIRECT_URL]: authURL });
+      const contextObject = { credentialsObject, id, email };
+      return getAuthURLAndSendRedirectJSON(res, contextObject, 401);
     }
       
     if (REDIRECT_AUTH_URLS) {

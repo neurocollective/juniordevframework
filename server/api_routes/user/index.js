@@ -6,13 +6,16 @@ const {
 		KEY: COOKIE_KEY
 	}
 } = require('../../lib/constants');
-const  {
-  env: {
-    REDIRECT_AUTH_URLS: redirectEnvValue = ''
-  }
-} = process;
+const {
+	createSessionCookie
+} = require('../../lib');
+// const  {
+//   env: {
+//     REDIRECT_AUTH_URLS: redirectEnvValue = ''
+//   }
+// } = process;
 
-const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
+// const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 
 const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 
@@ -36,20 +39,20 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 		let userId;
 		try {
 			const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
-			userId = (newUser) ? newUser.id : null;
+			({ id: userId } = newUser);
 		} catch (err) {
 			console.error('signup error:', err);
 
 			const failMessage = 'could not create new user';
-			if (REDIRECT_AUTH_URLS) {
-				return res.redirect(`/?newusercreated=false&error=${failMessage.replace(/ /g, '+')}`);
-			}
+			// if (REDIRECT_AUTH_URLS) {
+			// 	return res.redirect(`/?newusercreated=false&error=${failMessage.replace(/ /g, '+')}`);
+			// }
 			return res.status(500).json({ error: failMessage });
 		}
 
-		if (REDIRECT_AUTH_URLS) {
-			return res.redirect('/?newusercreated=true');
-		}
+		// if (REDIRECT_AUTH_URLS) {
+		// 	return res.redirect('/?newusercreated=true');
+		// }
 
 		// const cookieValue = uuid();
 		// res.setCookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
@@ -57,10 +60,15 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 		// try {
 		// 	await redisFunctions.mapCookieAndUserId(cookieValue, userId);
 		// } catch (err) {
-
+		// 	console.error(err);
 		// }
 
-		return res.status(200).json({ email, message: `new user ${firstName} ${lastName} created` });
+		await createSessionCookie(res, redisFunctions);
+
+		const contextObject = { credentialsObject, userId, email };
+    return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
+
+		// return res.status(200).json({ email, message: `new user ${firstName} ${lastName} created` });
 	});
 
 	return userRouter;

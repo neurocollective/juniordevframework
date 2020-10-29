@@ -1,27 +1,29 @@
 const { Router } = require('express');
-const { v4: uuid } = require('uuid');
+// const { v4: uuid } = require('uuid');
 const {
   getGmailProfile,
   requestToken,
   isTokenExpiredByAPICheck,
-  getAuthUrlFromCredentials
+  getAuthUrlFromCredentials,
+  createSessionCookie
 } = require('../../lib');
 const {
-  MIDDLEWARE: {
-    REDIRECT_URL
-  },
+  // MIDDLEWARE: {
+  //   REDIRECT_URL
+  // },
   COOKIES: {
     KEY: COOKIE_KEY,
     COOKIE_MAX_AGE
   }
 } = require('../../lib/constants');
-const  {
-  env: {
-    REDIRECT_AUTH_URLS: redirectEnvValue = ''
-  }
-} = process;
 
-const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
+// const  {
+//   env: {
+//     REDIRECT_AUTH_URLS: redirectEnvValue = ''
+//   }
+// } = process;
+
+// const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 
 const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 
@@ -100,14 +102,30 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
       await dbFunctions.updateTokenValueForUser(token, userId);
     }
 
-    const cookieValue = uuid();
-    res.cookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
+    // const cookieValue = uuid();
+    // res.cookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
 
-    try {
-      await redisFunctions.mapCookieAndUserId(cookieValue, userId);
-    } catch (err) {
-      console.error('error setting key/value in redis:', err);
-    }
+    // try {
+    //   await redisFunctions.mapCookieAndUserId(cookieValue, userId);
+    // } catch (err) {
+    //   console.error('error setting key/value in redis:', err);
+    // }
+
+    // const createSessionCookie = async (res, redisFunctions) => {
+    //   const cookieValue = uuid();
+    //   res.cookie(COOKIE_KEY, cookieValue, { maxAge: COOKIE_MAX_AGE, httpOnly: true });
+
+    //   try {
+    //     await redisFunctions.mapCookieAndUserId(cookieValue, userId);
+    //   } catch (err) {
+    //     console.error('error setting key/value in redis:', err);
+    //     return Promise.reject(err);
+    //   }
+
+    //   return cookieValue;
+    // };
+
+    await createSessionCookie(res, redisFunctions);
 
     console.log('sending user to /?authorized=true');
     return res.redirect('http://localhost:8080/?authorized=true');
