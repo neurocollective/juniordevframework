@@ -7,7 +7,8 @@ const {
 	}
 } = require('../../lib/constants');
 const {
-	createSessionCookie
+	createSessionCookie,
+	getAuthURLAndSendRedirectJSON
 } = require('../../lib');
 // const  {
 //   env: {
@@ -63,7 +64,7 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 		// 	console.error(err);
 		// }
 
-		await createSessionCookie(res, redisFunctions);
+		await createSessionCookie(res, redisFunctions, userId);
 
 		const contextObject = { credentialsObject, userId, email };
     return getAuthURLAndSendRedirectJSON(res, contextObject, 200);

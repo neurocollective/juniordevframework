@@ -77,7 +77,8 @@
     // },
     // ROUTING: {
     //   SLASH_LOGIN
-    // }
+    // },
+    COOKIES
   } = CONSTANTS;
 
   const {
@@ -94,6 +95,10 @@
     APP_NAME
   } = UI_CONSTANTS;
 
+  const {
+    CUSTOM_COOKIE_HEADER
+  } = COOKIES;
+
   export default {
     name: 'App',
     created: async function() {
@@ -104,16 +109,31 @@
 
       adjustStateToLoadingPath(this.$store.dispatch);
 
-      // const onJson = (statusCode, ok, json) => {
-      //   const payload = { json, statusCode };
-      //   const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
-      //   return this.$store.dispatch({ type, payload });
-      // };
+      let STORAGE;
+      if (typeof localStorage !== 'undefined') {
+        STORAGE = localStorage;
+      } else {
+        STORAGE = {
+          getItem: () => {},
+          setItem: () => {}
+        };
+      }
+
+      const customCookie = STORAGE.getItem(CUSTOM_COOKIE_HEADER);
+
+      const headers = {};
 
       const fetchOptions = {
         url: 'http://localhost:3000/api/pageload', // TODO - make this URL dynamic
-        onJson: this.onPageLoadJson
+        onJson: this.onPageLoadJson,
       };
+
+      if (customCookie) {
+        headers[CUSTOM_COOKIE_HEADER] = customCookie;
+      }
+
+      fetchOptions.headers = headers;
+
       await this.fetchJsonOrRedirect(fetchOptions);
     },
     computed: {
@@ -138,6 +158,17 @@
     },
     methods: {
       onPageLoadJson(statusCode, ok, json) {
+        // let STORAGE;
+        // if (typeof localStorage !== 'undefined') {
+        //   STORAGE = localStorage;
+        // } else {
+        //   STORAGE = {
+        //     getItem: () => {},
+        //     setItem: () => {}
+        //   };
+        // }
+        // const customCookie = STORAGE.getItem(CUSTOM_COOKIE_HEADER);
+
         const payload = { json, statusCode };
         const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
         return this.$store.dispatch({ type, payload });

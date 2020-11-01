@@ -14,6 +14,9 @@ const {
   },
   ROUTING: {
     SLASH_LOGIN
+  },
+  COOKIES: {
+    CUSTOM_COOKIE_HEADER
   }
 } = CONSTANTS;
 
@@ -31,7 +34,8 @@ export const buildFetchJsonOrRedirect = (dispatch) => async (fetchOptions) => {
 
   const {
     ok,
-    statusCode
+    statusCode,
+    headers
   } = response;
 
   const json = await response.json();
@@ -40,7 +44,17 @@ export const buildFetchJsonOrRedirect = (dispatch) => async (fetchOptions) => {
     [REDIRECT_URL]: redirectURL
   } = json;
 
-  console.log('fetchJsonOrRedirect has redirectURL of', redirectURL);
+  let STORAGE;
+  if (typeof localStorage !== 'undefined') {
+    STORAGE = localStorage;
+  } else {
+    STORAGE = {
+      getItem: () => {},
+      setItem: () => {}
+    };
+  }
+
+  STORAGE.setItem(CUSTOM_COOKIE_HEADER, headers[CUSTOM_COOKIE_HEADER]);
 
   if (!redirectURL) {
     const { onJson } = fetchOptions;

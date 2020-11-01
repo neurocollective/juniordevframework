@@ -125,7 +125,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
     //   return cookieValue;
     // };
 
-    await createSessionCookie(res, redisFunctions);
+    await createSessionCookie(res, redisFunctions, userId);
 
     console.log('sending user to /?authorized=true');
     return res.redirect('http://localhost:8080/?authorized=true');
