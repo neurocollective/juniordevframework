@@ -86,6 +86,13 @@ const bootServer = async () => {
   if (!local) {
     app.use('/', express.static('public'));
   } else {
+    // default CORS options:
+    // {
+    //   "origin": "*",
+    //   "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    //   "preflightContinue": false,
+    //   "optionsSuccessStatus": 204
+    // }
     const corsOptions = { origin: ['http://localhost:8080', 'http://localhost:3000'] };
     const corsMiddleware = cors(corsOptions);
     const corsMiddlewareWithAllowCredentials = (req, res, next) => {

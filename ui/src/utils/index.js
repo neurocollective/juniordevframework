@@ -54,7 +54,10 @@ export const buildFetchJsonOrRedirect = (dispatch) => async (fetchOptions) => {
     };
   }
 
-  STORAGE.setItem(CUSTOM_COOKIE_HEADER, headers[CUSTOM_COOKIE_HEADER]);
+  const cookie = headers.get(CUSTOM_COOKIE_HEADER);
+  if (cookie && cookie !== 'undefined') {
+    STORAGE.setItem(CUSTOM_COOKIE_HEADER, cookie);
+  }
 
   if (!redirectURL) {
     const { onJson } = fetchOptions;

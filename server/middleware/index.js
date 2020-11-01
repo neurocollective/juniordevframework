@@ -95,7 +95,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
     if (local) {
       console.log('invalid token in checkForValidToken, sending redirect');
     }
-    const { rows: [{ email }] } = await getEmailForUserId(userId);
+    const { rows: [{ email }] } = await postgresFunctions.getEmailForUserId(userId);
     const redirectURL = getAuthUrlFromCredentials(credentialsObject, userId, email);
     return res.status(401).json({ [REDIRECT_URL]: redirectURL });
   };
