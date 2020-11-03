@@ -38,7 +38,7 @@ const useHTTP = !argv.find(arg => arg.includes("--http"));
 
 const HTTP_PORT = 80;
 const HTTPS_PORT = 443;
-const {
+let {
   env: {
     PORT = 3000,
     LOCAL_MODE
@@ -79,6 +79,10 @@ const bootServer = async () => {
 
   // parsing middleware
   // TODO - this could be more targeted in middleware/index.js? Avoiding unnecessary middleware could give small performance boost
+  app.use((req, res, next) => {
+    console.log('sanity check middleware');
+    return next();
+  });
   app.use(express.json());
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false }));

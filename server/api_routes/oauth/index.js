@@ -45,19 +45,18 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
     let token;
     let error;
     let statusCode;
+    let requestError;
     try {
-      const responseObject = await requestToken(credentialsObject, code);
-      token = responseObject.response;
-      error = responseObject.error;
-      statusCode = responseObject.statusCode;
+      ({ response: token, error, statusCode } = await requestToken(credentialsObject, code));
     } catch (err) {
       console.error('error running requestToken at /oauth:', err);
-      requestError = err.message;
     }
 
     if (error || !token || !token['access_token']) {
-      const error = `token not retrieved! statusCode from google: ${statusCode}, error: ${requestError}`;
-      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
+      const errorMessage = `token not retrieved! statusCode from google: ${statusCode}, error: ${error}`;
+      console.error('line 57 error:', errorMessage);
+      console.error('token', token);
+      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(errorMessage)}`);
     }
 
     const {
