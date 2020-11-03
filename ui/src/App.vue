@@ -67,25 +67,37 @@
 <script>
   import router from './router';
   import CONSTANTS from './lib/constants';
-  import { fetchJSON, adjustStateToLoadingPath } from './lib';
+  import { buildFetchJsonOrRedirect } from './utils';
+  import { adjustStateToLoadingPath } from './lib';
 
   const {
     UI_CONSTANTS,
-    MIDDLEWARE: {
-      REDIRECT_URL
-    },
-    ROUTING: {
-      SLASH_LOGIN
-    }
+    // MIDDLEWARE: {
+    //   REDIRECT_URL
+    // },
+    // ROUTING: {
+    //   SLASH_LOGIN
+    // },
+    COOKIES
   } = CONSTANTS;
 
   const {
     ACTION_TYPES: {
       LOAD_PAGE_DATA_SUCCESS,
-      LOAD_PAGE_DATA_ERROR
+      LOAD_PAGE_DATA_ERROR,
+      GO_HOME,
+      GO_TO_ACCOUNT,
+      GO_TO_RESULTS,
+      GO_TO_TODOS,
+      GO_TO_CONTACTS,
+      TOGGLE_MENU
     },
     APP_NAME
   } = UI_CONSTANTS;
+
+  const {
+    CUSTOM_COOKIE_HEADER
+  } = COOKIES;
 
   export default {
     name: 'App',
@@ -97,27 +109,32 @@
 
       adjustStateToLoadingPath(this.$store.dispatch);
 
-      const [statusCode, ok, json] = await fetchJSON('http://localhost:3000/api/pageload');
-
-      const {
-        [REDIRECT_URL]: redirectURL
-      } = json;
-
-      if (redirectURL) {
-        // putting in a switch in case we want other routing options later.
-        // If SLASH_LOGIN turns out to be the only option needed, this can refactor
-        switch (redirectURL) {
-          case SLASH_LOGIN:
-          console.log('REDIRECTING TO', SLASH_LOGIN);
-            return this.$store.dispatch('goToLogin');
-          default:
-            // do nada
-        }
+      let STORAGE;
+      if (typeof localStorage !== 'undefined') {
+        STORAGE = localStorage;
+      } else {
+        STORAGE = {
+          getItem: () => {},
+          setItem: () => {}
+        };
       }
 
-      const payload = { json, statusCode };
-      const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
-      return this.$store.dispatch({ type, payload });
+      const customCookie = STORAGE.getItem(CUSTOM_COOKIE_HEADER);
+
+      const headers = {};
+
+      const fetchOptions = {
+        url: 'http://localhost:3000/api/pageload', // TODO - make this URL dynamic
+        onJson: this.onPageLoadJson,
+      };
+
+      if (customCookie) {
+        headers[CUSTOM_COOKIE_HEADER] = customCookie;
+      }
+
+      fetchOptions.headers = headers;
+
+      await this.fetchJsonOrRedirect(fetchOptions);
     },
     computed: {
       router() {
@@ -136,36 +153,59 @@
         return this.$store.state.pageLoadError;
       },
       pageLoadData() {
-        console.log('pageLoadData:', this.$store.state.pageLoadData);
         return this.$store.state.pageLoadData;
       }
     },
     methods: {
-      // handleClick() {
-      //   console.log('clicky');
-      // },
+      onPageLoadJson(statusCode, ok, json) {
+        // let STORAGE;
+        // if (typeof localStorage !== 'undefined') {
+        //   STORAGE = localStorage;
+        // } else {
+        //   STORAGE = {
+        //     getItem: () => {},
+        //     setItem: () => {}
+        //   };
+        // }
+        // const customCookie = STORAGE.getItem(CUSTOM_COOKIE_HEADER);
+
+        const payload = { json, statusCode };
+        const type = ok ? LOAD_PAGE_DATA_SUCCESS : LOAD_PAGE_DATA_ERROR;
+        return this.$store.dispatch({ type, payload });
+      },
+      fetchJsonOrRedirect(options) {
+        const builtFunction = buildFetchJsonOrRedirect(this.$store.dispatch);
+        return builtFunction(options);
+      },
       toggleMenu() {
-        this.$store.dispatch('toggleMenu');
+        // console.log('toggleMenu firing');
+        this.$store.dispatch(TOGGLE_MENU);
+        // this.showMenu = !(this.showMenu);
       },
       goToHome() {
-        this.$store.dispatch('goHome');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_HOME);
+        // this.toggleMenu();
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToAccount() {
-        this.$store.dispatch('goToAccount');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_ACCOUNT);
+        // this.toggleMenu();
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToResults() {
-        this.$store.dispatch('goToResults');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_RESULTS);
+        // this.toggleMenu();
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToToDos() {
-        this.$store.dispatch('goToToDos');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_TODOS);
+        // this.toggleMenu();
+        this.$store.dispatch(TOGGLE_MENU);
       },
       goToContacts() {
-        this.$store.dispatch('goToContacts');
-        this.$store.dispatch('toggleMenu');
+        this.$store.dispatch(GO_TO_CONTACTS);
+        // this.toggleMenu();
+        this.$store.dispatch(TOGGLE_MENU);
       },
       // goToLogin() {
       //   this.$store.dispatch('goToLogin');
@@ -176,7 +216,8 @@
     },
     data() {
       return {
-        appName: APP_NAME
+        appName: APP_NAME,
+        // showMenu: false,
       };
     }
   };
@@ -187,7 +228,5 @@
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-/*    text-align: center;
-    color: #2c3e50;*/
   }
 </style>

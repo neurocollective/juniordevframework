@@ -32,6 +32,7 @@ If you need to know more, raise an issue!
 #### Step One: Install `make` (windows && linux only, built-in on mac)
 
 windows: `choco install make`
+<br />
 linux: `sudo apt-get install build-essential -y`
 
 #### Step Two: Install Node via `nvm` (node version manager):
@@ -46,6 +47,7 @@ https://docs.docker.com/compose/install/
 #### Step Four: Clone this repo:
 
 ssh (recommended): `git clone git@github.com:neurocollective/juniordevframework.git`
+<br />
 https: `https://github.com/neurocollective/juniordevframework.git`
 
 #### Step Five: Get your gmail API key:
@@ -65,20 +67,9 @@ https: `https://github.com/neurocollective/juniordevframework.git`
 />	
 </div>
 <hr />
-
-<!--
-
-<div style="border: 1px solid black;">
-<img
-	src="credentials_example.png" alt="screenshot of the create credentials fields"
-/>	
-</div>
-
--->
-
 <br />
 
-Please note, you have not actually authorized any application to access your gmail yet. If you have questions about OAuth access to gmail, see the `FAQ` section.
+(You have not actually authorized any application to access your gmail yet, just created the ability to do so on google's end. If you have questions about OAuth access to gmail, see the `FAQ` section.)
 
 #### Step Six: `juniordevframework/server/credentials.json` must be created and should look like this:
 
@@ -91,6 +82,9 @@ Please note, you have not actually authorized any application to access your gma
 	}
 }
 ```
+
+(note that `server/credentials.json` is ignored by git so that you cannot accidentally commit your credentials)
+
 #### Step Seven: Shell Commands
 
 (be connected to the internet, `docker` will need to pull images on the first run, and the server needs to talk to google APIs)
@@ -98,8 +92,8 @@ Please note, you have not actually authorized any application to access your gma
 - `npm install -g @vue/cli`
 - `make install`
 - `make db`
-- `make vue`
-- (in new tab) `make serve`
+- `make vue` (runs ui server on 8080)
+- (in new tab) `make serve` (runs api server on 3000)
 
 #### Step Eight: Load `localhost:8080` in your browser!
 
@@ -155,11 +149,11 @@ I personally think doing is the best way to learn - try tinkering with the code 
 
 If you like educational resources...
 
-https://www.codecademy.com/learn/learn-vue-js
+[Codecademy](https://www.codecademy.com/learn/learn-vue-js)
 
-https://vuejs.org/
+[vuejs.org](https://vuejs.org/)
 
-https://learnvue.co/
+[learnvue](https://learnvue.co/)
 
 - How do I make a Pull Request when I am totally lost?
 
@@ -183,9 +177,9 @@ Why not?
 
 I just can't.
 
-# CoreContributors
+# Core Contributors
 
-(anyone with a merged PR will be added to this list)
+(anyone with a merged PR during the alpha will be added to this list)
 
-neurocollective
-jordanjmiller
+[neurocollective](https://github.com/neurocollective/)
+[jordanjmiller](https://github.com/jordanjmiller)
