@@ -25,11 +25,10 @@ test:
 serve:
 	LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
 library:
-	# this should leave out non .js files in the future, and any node_modules
-	cp -r ./lib/ ./server/
-	cp -r ./lib/ ./ui/src/
-	cp -r ./lib/ ./job_runner/
-	cp -r ./lib/ ./oauth_server/	
+	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./ui/src/
+	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./server/
+	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./job_runner/
+	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./oauth_server/	
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 install:
