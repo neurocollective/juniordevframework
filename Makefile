@@ -56,6 +56,8 @@ psql:
 	docker exec -it junior_dev_framework_dev_postgres psql -U postgres
 user_listings:
 	node ./job_runner create_user_listings
+scan:
+	node ./job_runner scan
 oaserve:
 	npx nodemon -x 'node -e "const { bootServer } = require(\"./oauth_server\"); bootServer();"'
 build/prod:
