@@ -30,7 +30,6 @@ library:
 	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./ui/src/
 	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./server/
 	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./job_runner/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./oauth_server/
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 install:
