@@ -25,7 +25,8 @@ test:
 	# npm run test:unit  --prefix ./ui
 serve:
 	make library
-	LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
+	# LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
+	LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
 library:
 # 	cp -r ./lib/ ./server/
 # 	cp -r ./lib/ ./ui/src/
