@@ -12,16 +12,18 @@ const {
   bootstrapPostgresFunctions,
   bootstrapRedisFunctions
 } = require('../lib/postgres');
+const {
+  env: {
+    USER_ID: userId,
+  }
+} = process;
 
 const main = async () => {
-  // console.log('HAI main()');
-
   const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
-
   const {
     dbConnection: connectionString = '',
     tlsKeyPath,
-    tlsCertPath
+    tlsCertPath,
   } = CONFIG;
 
   const pgFunctions = await bootstrapPostgresFunctions(Client, connectionString);
@@ -39,7 +41,7 @@ const main = async () => {
       createUserListings(pgFunctions);
     }
     case JOB_COMMAND_SCAN_EMAILS: {
-      scanEmails(pgFunctions, redisFunctions);
+      scanEmails(pgFunctions, redisFunctions, userId);
     }
     default: {
       console.error(`command ${command} not found, exiting.`);
