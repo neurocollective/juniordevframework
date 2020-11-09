@@ -143,6 +143,8 @@ NO! Don't let the natural disorientation of a new codebase intimidate you, or im
 
 Other than installing docker, you don't need to know much about docker, redis, or postgres at all. Most of the implementation details of these tech is taken care of and abstracted away. Don't let it scare you away!
 
+Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
+
 - I don't know vue.js. How do I learn it?
 
 I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up. 

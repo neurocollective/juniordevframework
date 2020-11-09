@@ -38,7 +38,6 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
   // const { getUserIdForCookie, mapCookieAndUserId } = redisFunctions;
 
   const checkForValidSession = async (req, res, next) => {
-    console.log('authMiddleware.checkForValidSession');
     const {
       cookies: {
         [SESSION_KEY]: cookieValue
@@ -61,7 +60,6 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
   };
 
   const checkForValidToken = async (req, res, next) => {
-    console.log('authMiddleware.checkForValidToken');
     req.validToken = false;
     const { [USER_ID]: userId } = req;
 
