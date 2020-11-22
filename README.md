@@ -149,13 +149,7 @@ Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframew
 
 I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up. 
 
-If you like educational resources...
-
-[Codecademy](https://www.codecademy.com/learn/learn-vue-js)
-
-[vuejs.org](https://vuejs.org/)
-
-[learnvue](https://learnvue.co/)
+Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
 
 - How do I make a Pull Request when I am totally lost?
 
@@ -183,5 +177,5 @@ I just can't.
 
 (anyone with a merged PR during the alpha will be added to this list)
 
-[neurocollective](https://github.com/neurocollective/)
+[neurocollective](https://github.com/neurocollective)
 [jordanjmiller](https://github.com/jordanjmiller)
