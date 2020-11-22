@@ -15,7 +15,17 @@ const {
   ACTION_TYPES: {
     LOAD_PAGE_DATA_SUCCESS,
     LOAD_PAGE_DATA_ERROR,
-    CHANGE_ROUTE
+    CHANGE_ROUTE,
+    TOGGLE_MENU,
+    GO_TO_CONTACTS,
+    GO_TO_TODOS,
+    GO_TO_RESULTS,
+    GO_TO_ACCOUNT,
+    GO_TO_LOGIN,
+    GO_TO_SIGNUP,
+    INCREMENT_PAGE_COUNT,
+    GO_HOME,
+    LOGIN_ERROR
   }
 } = UI_CONSTANTS;
 
@@ -36,7 +46,8 @@ export default new Vuex.Store({
     count: 0,
     showMenu: false,
     pageLoadError: null,
-    pageLoadData: {}
+    pageLoadData: {},
+    loginError: ''
   },
   mutations: {
     incrementPage(state) {
@@ -44,7 +55,6 @@ export default new Vuex.Store({
     },
     setPageRoute(state, payload) {
       const { destination } = payload;
-
       state.currentComponent = destination;
       const { page } = state;
       window.history.pushState({ page }, `title${page}`, `/${destination}`);
@@ -56,67 +66,79 @@ export default new Vuex.Store({
     setPageLoadError(state, err) {
       state.pageLoadError = err;
     },
-    setPageLoadData(state, { payload }) {
-      console.log('payload.json.data:', payload.json.data);
+    setPageLoadData(state, { payload = {} }) {
+      const { json: { data } = {} } = payload;
       state.pageLoadData = payload;
-      state.userJobListings = payload.json.data;
+      state.userJobListings = data;
+    },
+    setLoginError(state, error) {
+      console.log('setLoginError error', error);
+      state.loginError = error;
     }
   },
   actions: {
-    incrementPageCount: function({ commit }) {
+    [INCREMENT_PAGE_COUNT]: function({ commit }) {
       commit('incrementPage');
     },
     [CHANGE_ROUTE]: function({ commit }, { destination }) {
       console.log(`changing routes to ${destination}`);
       commit({ type: 'setPageRoute', destination });
     },
-    toggleMenu({ commit }) {
+    [TOGGLE_MENU]: function({ commit }) {
       commit({ type: 'toggleMenu' });
     },
-    goHome({ dispatch }) {
+    [GO_HOME]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(HOME)))
         .catch(handleRoutingError);
     },
-    goToAccount({ dispatch }) {
+    [GO_TO_ACCOUNT]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(ACCOUNT)))
         .catch(handleRoutingError);
     },
-    goToResults({ dispatch }) {
+    [GO_TO_RESULTS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(RESULTS)))
         .catch(handleRoutingError);
     },
-    goToToDos({ dispatch }) {
+    [GO_TO_TODOS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(TODOS)))
         .catch(handleRoutingError);
     },
-    goToContacts({ dispatch }) {
+    [GO_TO_CONTACTS]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(CONTACTS)))
         .catch(handleRoutingError);
     },
-    goToLogin({ dispatch }) {
+    [GO_TO_LOGIN]: function({ dispatch }) {
       console.log('goToLogin inside store');
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(LOGIN)))
         .catch(handleRoutingError);
     },
-    goToSignup({ dispatch }) {
+    [GO_TO_SIGNUP]: function({ dispatch }) {
       dispatch(getIncrementPageAction())
         .then(() => dispatch(getRouteChangeAction(SIGNUP)))
         .catch(handleRoutingError);
     },
-    [LOAD_PAGE_DATA_SUCCESS]: function({ commit }, payload) {
-      console.log(`store has ${LOAD_PAGE_DATA_SUCCESS}`);
+    [LOAD_PAGE_DATA_SUCCESS]: function({ commit }, payload = {}) {
       commit('setPageLoadData', payload);
     },
-    [LOAD_PAGE_DATA_ERROR]: function({ commit }, payload) {
+    [LOAD_PAGE_DATA_ERROR]: function({ commit }, payload = {}) {
       const { json: { error = 'data failed to load' } = {} } = payload;
-      console.log(`store has ${LOAD_PAGE_DATA_ERROR}, error is ${error}`);
       commit('setPageLoadError', error);
+    },
+    [LOGIN_ERROR]: function({ commit }, action = {}) {
+      const {
+        payload: {
+          json: {
+            error
+          } = {}
+        } = {}
+      } = action;
+      commit('setLoginError', error);
     }
   },
   modules: {

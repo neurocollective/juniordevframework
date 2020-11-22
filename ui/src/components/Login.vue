@@ -8,6 +8,9 @@
         <button @click="onSubmit">Login</button>
       </div>
     </div>
+    <div v-if="this.loginError" class="login-error">
+      {{ this.loginError }}
+    </div>
     <div>
        <span>No account?</span>
        &nbsp;
@@ -17,19 +20,35 @@
 </template>
 
 <script>
+import { buildFetchJsonOrRedirect } from '../utils';
+import { UI_CONSTANTS } from '../lib/constants';
+
+const {
+  ACTION_TYPES: {
+    LOGIN_ERROR
+  }
+} = UI_CONSTANTS;
+
 export default {
-  name: 'login',
+  name: 'Login',
   computed: {
     userJobListings() {
       return this.$store.state.userJobListings;
+    },
+    loginError() {
+      return this.$store.state.loginError;
     }
   },
   data: function() {
     return { email: '' };
   },
   methods: {
-    navigateToSignUp() {
-      this.$store.dispatch('goToSignup');
+    // navigateToSignUp() {
+    //   this.$store.dispatch('goToSignup');
+    // },
+    fetchJsonOrRedirect(fetchOptions) {
+      const builtFunction = buildFetchJsonOrRedirect(this.$store.dispatch);
+      return builtFunction(fetchOptions);
     },
     // goToLogin() {
     //   this.$store.dispatch('goToLogin');
@@ -38,7 +57,34 @@ export default {
       this.$store.dispatch('goToSignup');
     },
     onSubmit() {
-      console.log('onSubmit, email is:', this.email);
+      // console.log('onSubmit, email is:', this.email);
+
+      const onJson = (statusCode, ok, json) => {
+        // console.log('Login\'s onJson');
+        if (!ok) {
+          // console.log('Login.onJSON error:', json.error);
+          const payload = { json };
+          this.$store.dispatch({ type: LOGIN_ERROR, payload });
+        }
+
+        if (json.authorized) {
+          this.$store.dispatch('goToHome');
+        }
+      };
+
+      const fetchOptions = {
+        url: 'http://localhost:3000/api/login',
+        method: 'POST',
+        body: JSON.stringify({
+          email: this.email
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        onJson
+      };
+      this.fetchJsonOrRedirect(fetchOptions);
     }
   }
 };
@@ -46,16 +92,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .todos-container {
-  }
+  .login-container {
 
-  .todo-container {
-    border: 1px solid black;
-    border-radius: 5px;
-    max-width: 50%;
-    margin: 5px auto;
-    padding: 10px;
-/*    display: flex;
-    justify-content: center;*/
+  }
+  .login-error {
+    color: red;
   }
 </style>

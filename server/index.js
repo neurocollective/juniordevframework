@@ -38,7 +38,7 @@ const useHTTP = !argv.find(arg => arg.includes("--http"));
 
 const HTTP_PORT = 80;
 const HTTPS_PORT = 443;
-const {
+let {
   env: {
     PORT = 3000,
     LOCAL_MODE
@@ -75,9 +75,14 @@ if (useTLS) {
 const bootServer = async () => {
 
   const { rows: [credentials] } = await postgresFunctions.getCredentials();
+  console.log('credentials', credentials);
 
   // parsing middleware
   // TODO - this could be more targeted in middleware/index.js? Avoiding unnecessary middleware could give small performance boost
+  app.use((req, res, next) => {
+    console.log('sanity check middleware');
+    return next();
+  });
   app.use(express.json());
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false }));
@@ -85,7 +90,20 @@ const bootServer = async () => {
   if (!local) {
     app.use('/', express.static('public'));
   } else {
-    app.use(cors());
+    // default CORS options:
+    // {
+    //   "origin": "*",
+    //   "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    //   "preflightContinue": false,
+    //   "optionsSuccessStatus": 204
+    // }
+    const corsOptions = { origin: ['http://localhost:8080', 'http://localhost:3000'] };
+    const corsMiddleware = cors(corsOptions);
+    const corsMiddlewareWithAllowCredentials = (req, res, next) => {
+      res.set('Access-Control-Allow-Credentials', 'true'); // required for cross-origin cookie transfer, on client side
+      corsMiddleware(req, res, next);
+    };
+    app.use(corsMiddlewareWithAllowCredentials);
   }
 
   // console.log(postgresFunctions);

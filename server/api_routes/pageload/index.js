@@ -12,7 +12,7 @@ const getPageLoadRouter = (postgresFunctions, redisFunctions, credentialsObject)
   const pageLoadRouter = Router();
 
   pageLoadRouter.get('/', async (req, res) => {
-
+  	console.log('PAGE LOAD');
   	const dbRes = await postgresFunctions.getListingsForUser(1);
   	console.log('dbRes.rows:', dbRes.rows);
     const response = { message: 'pageload!', data: dbRes.rows };

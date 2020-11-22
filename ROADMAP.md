@@ -44,6 +44,8 @@ This vision is NOT written in stone. If you have feedback or suggestions on how 
 
 - Build resume generation feature
 
+- Improve mobile sceen support
+
 #### Stretch goals
 
 - Scrape web / consume some API for new contact suggestions
