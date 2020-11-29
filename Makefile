@@ -55,7 +55,7 @@ psql:
 user_listings:
 	node ./job_runner create_user_listings
 scan:
-	node ./job_runner scan
+	USER_ID=1 node ./job_runner scan_emails
 oaserve:
 	npx nodemon -x 'node -e "const { bootServer } = require(\"./oauth_server\"); bootServer();"'
 build/prod:

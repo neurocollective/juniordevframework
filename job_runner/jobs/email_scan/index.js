@@ -1,9 +1,6 @@
-const { refreshToken } = require('../../lib');
+const { refreshToken, isTokenExpiredByAPICheck } = require('../../lib');
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
-  
-	// let token;
-	// let credentialsObject;
 
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
   const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
@@ -13,21 +10,30 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     process.exit(1);
   }
 
-  if (!token) {
-    console.error('no token data found in db');
+  if (!token || !token['refresh_token']) {
+    console.error('no refresh token data found in db');
     process.exit(1);
   }
 
-  const refreshToken = await refreshToken(credentialsObject, token, uerId);
+  const tokenIsExpired = await isTokenExpiredByAPICheck(token);
+  let refreshedToken;
 
-  // TODO - store refesToken
-
-  if (!refreshToken) {
-  	console.error('no refresh');
+  if (tokenIsExpired) {
+    console.log('refreshing token before email scan...');
+    refreshedToken = await refreshToken(credentialsObject, token, userId);
+  } else {
+    refreshedToken = token;
   }
 
-};
+  if (!refreshedToken) {
+  	console.error('no refresh token');
+  } else {
+    console.log('refreshed token:', refreshedToken);
+  }
 
+  // implement API call to get emails here
+
+};
 
 module.exports = {
   scanEmails
