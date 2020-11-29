@@ -12,7 +12,7 @@ const {
   bootstrapPostgresFunctions
 } = require('./lib/postgres');
 const {
-  bootStrapRedisFunctions
+  bootstrapRedisFunctions
 } = require('./lib/redis');
 
 const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
@@ -28,7 +28,7 @@ const postgresFunctions = bootstrapPostgresFunctions(Client, connectionString);
 const redisClient = redis.createClient();
 redisClient.on('connect', () => console.log('redis connected'));
 
-const redisFunctions = bootStrapRedisFunctions(redisClient);
+const redisFunctions = bootstrapRedisFunctions(redisClient);
 
 const {
   argv

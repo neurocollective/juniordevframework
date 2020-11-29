@@ -1,3 +1,7 @@
+const fs = require('fs');
+const { Client } = require('pg');
+const redis = require('redis');
+
 const {
   createUserListings
 } = require('./jobs/create_user_listings');
@@ -7,11 +11,13 @@ const {
 const {
   JOB_COMMAND_CREATE_USER_LISTINGS
 } = require('../lib/constants');
-const { Client } = require('pg');
 const {
-  bootstrapPostgresFunctions,
-  bootstrapRedisFunctions
+  bootstrapPostgresFunctions
 } = require('../lib/postgres');
+const {
+  bootstrapRedisFunctions
+} = require('../lib/redis');
+
 const {
   env: {
     USER_ID: userId,
@@ -32,7 +38,7 @@ const main = async () => {
   const redisClient = redis.createClient();
   redisClient.on('connect', () => console.log('redis connected'));
 
-  const redisFunctions = bootStrapRedisFunctions(redisClient);
+  const redisFunctions = bootstrapRedisFunctions(redisClient);
 
   const [,,command] = process.argv;
 
