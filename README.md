@@ -178,4 +178,5 @@ I just can't.
 (anyone with a merged PR during the alpha will be added to this list)
 
 [neurocollective](https://github.com/neurocollective)
-[jordanjmiller](https://github.com/jordanjmiller)
+[Jordan Miller](https://github.com/jordanjmiller)
+[Alexander Mosquea](https://github.com/ALmsq)
