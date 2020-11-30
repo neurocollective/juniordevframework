@@ -1,4 +1,8 @@
-const { refreshToken, isTokenExpiredByAPICheck } = require('../../lib');
+const {
+  refreshToken,
+  isTokenExpiredByAPICheck,
+  getGmailMessages
+} = require('../../lib');
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
@@ -32,7 +36,16 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   // implement API call to get emails here
+  const { response, statusCode, error } = await getGmailMessages(refreshedToken);
 
+
+  if (error) {
+    console.error(error);
+    process.exit(1);
+  }
+
+  console.log('response\'s statusCode:', statusCode);
+  console.log('response', response);
 };
 
 module.exports = {
