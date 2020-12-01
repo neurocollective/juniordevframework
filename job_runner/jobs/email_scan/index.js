@@ -1,7 +1,8 @@
 const {
   refreshToken,
   isTokenExpiredByAPICheck,
-  getGmailMessages
+  getGmailMessages,
+  insertRefreshedToken
 } = require('../../lib');
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
@@ -25,6 +26,10 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   if (tokenIsExpired) {
     console.log('refreshing token before email scan...');
     refreshedToken = await refreshToken(credentialsObject, token, userId);
+
+    // console.log('old token', token['access_token']);
+    // console.log("refreshedToken['access_token']", refreshedToken['access_token']);
+    await pgFunctions.insertRefreshedToken(refreshedToken, userId);
   } else {
     refreshedToken = token;
   }
@@ -37,7 +42,6 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   // implement API call to get emails here
   const { response, statusCode, error } = await getGmailMessages(refreshedToken);
-
 
   if (error) {
     console.error(error);
