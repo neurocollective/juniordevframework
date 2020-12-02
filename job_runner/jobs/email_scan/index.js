@@ -1,7 +1,8 @@
 const {
   refreshToken,
   isTokenExpiredByAPICheck,
-  getGmailMessages,
+  listGmailMessages,
+  getGmailMessageById,
   insertRefreshedToken
 } = require('../../lib');
 
@@ -20,7 +21,9 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     process.exit(1);
   }
 
-  const tokenIsExpired = await isTokenExpiredByAPICheck(token);
+  const accessToken = token['access_token'];
+
+  const tokenIsExpired = await isTokenExpiredByAPICheck(accessToken);
   let refreshedToken;
 
   if (tokenIsExpired) {
@@ -41,7 +44,9 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   // implement API call to get emails here
-  const { response, statusCode, error } = await getGmailMessages(refreshedToken);
+  const { response, statusCode, error } = await listGmailMessages(refreshedToken);
+
+  const { messages } = response;
 
   if (error) {
     console.error(error);
@@ -49,7 +54,18 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   console.log('response\'s statusCode:', statusCode);
-  console.log('response', response);
+  console.log('response', messages);
+
+  const messagePromises = messages.map(({ id }) => getGmailMessageById(refreshedToken, id));
+  
+  let messageObjects;
+  try {
+    messageObjects = await Promise.all(messagePromises);
+  } catch (err) {
+    console.error(err.message);
+  }
+  console.log('messageObjects', messageObjects.map(({ response: r }) => r));
+  process.exit(1);
 };
 
 module.exports = {
