@@ -64,8 +64,30 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   } catch (err) {
     console.error(err.message);
   }
-  console.log('messageObjects', messageObjects.map(({ response: r }) => r));
-  process.exit(1);
+
+  const mappedEmailObjects = messageObjects.map(({ response: r }) => {
+    const {
+      payload: {
+        headers,
+        body,
+        parts
+      }
+    } = r;  
+    return { headers, body, parts };
+  });
+
+  const first = mappedEmailObjects[0];
+  console.log('messageObjects[0]', first);
+
+  const {
+    headers: headersArray,
+    parts: partsAray
+  } = first;
+
+  headersArray.forEach(h => console.log(h));
+  partsAray.forEach(p => console.log(p));
+
+  process.exit(0);
 };
 
 module.exports = {
