@@ -6,6 +6,13 @@ const {
   insertRefreshedToken
 } = require('../../lib');
 
+// TODO - this should probably come from constants
+const TARGET_MIME_TYPES = new Set([
+  'multipart/alternative',
+  'text/plain',
+  'text/html'
+]);
+
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
@@ -84,8 +91,26 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     parts: partsAray
   } = first;
 
-  headersArray.forEach(h => console.log(h));
-  partsAray.forEach(p => console.log(p));
+  const relevantHeaders = headersArray.reduce((accumulator, headerObject) => {
+    const { name, value } = headerObject;
+    
+    if (name == 'From') {
+      return accumulator.concat([{ name, value }]);
+    }
+
+    return accumulator;
+  }, []);
+
+  const relevantBodyParts = partsAray.reduce((accumulator, bodyObject) => {
+    const { parts, mimeType } = bodyObject;
+
+    if (TARGET_MIME_TYPES.has(mimeType)) {
+      // TODO - maybe scan through the parts.body first?
+      return accumulator.concat(parts);
+    }
+
+    return accumulator;
+  });
 
   process.exit(0);
 };
