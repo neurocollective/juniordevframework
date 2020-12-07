@@ -88,29 +88,40 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const {
     headers: headersArray,
-    parts: partsAray
+    parts: partsArray
   } = first;
 
   const relevantHeaders = headersArray.reduce((accumulator, headerObject) => {
     const { name, value } = headerObject;
     
     if (name == 'From') {
-      return accumulator.concat([{ name, value }]);
+      accumulator.push({ name, value });
+      return accumulator;
     }
 
     return accumulator;
   }, []);
 
-  const relevantBodyParts = partsAray.reduce((accumulator, bodyObject) => {
-    const { parts, mimeType } = bodyObject;
+  const relevantBodyParts = partsArray.reduce((accumulator, bodyObject) => {
+    const { body, mimeType } = bodyObject;
 
+    // console.log(body);
+
+    const buffer = Buffer.from(body.data, 'base64');
+    const text = buffer.toString();
+
+    // console.log('accumulator', accumulator);
     if (TARGET_MIME_TYPES.has(mimeType)) {
       // TODO - maybe scan through the parts.body first?
-      return accumulator.concat(parts);
+      accumulator.push(text);
+      return accumulator;
     }
 
     return accumulator;
-  });
+  }, []);
+
+  console.log('relevantBodyParts[0]', relevantBodyParts[0]);
+  console.log('relevantHeaders[0]', relevantHeaders[0]);
 
   process.exit(0);
 };

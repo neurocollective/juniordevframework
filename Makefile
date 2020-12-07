@@ -18,6 +18,7 @@ wake/db:
 wake:
 	make wake/db
 	make library
+	make serve
 test:
 	npm t --prefix ./lib
 	npm t --prefix ./job_runner
