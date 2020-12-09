@@ -13,6 +13,8 @@ const TARGET_MIME_TYPES = new Set([
   'text/html'
 ]);
 
+const TARGET_HEADERS = new Set(['Received', 'From', 'To']);
+
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
@@ -94,7 +96,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const relevantHeaders = headersArray.reduce((accumulator, headerObject) => {
     const { name, value } = headerObject;
     
-    if (name == 'From') {
+    if (TARGET_HEADERS.has(name)) {
       accumulator.push({ name, value });
       return accumulator;
     }
@@ -121,7 +123,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }, []);
 
   console.log('relevantBodyParts[0]', relevantBodyParts[0]);
-  console.log('relevantHeaders[0]', relevantHeaders[0]);
+  console.log('relevantHeaders', relevantHeaders);
 
   process.exit(0);
 };
