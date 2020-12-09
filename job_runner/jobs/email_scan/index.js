@@ -3,17 +3,17 @@ const {
   isTokenExpiredByAPICheck,
   listGmailMessages,
   getGmailMessageById,
-  insertRefreshedToken
+  insertRefreshedToken,
+  decodeBase64String,
+  CONSTANTS
 } = require('../../lib');
 
-// TODO - this should probably come from constants
-const TARGET_MIME_TYPES = new Set([
-  'multipart/alternative',
-  'text/plain',
-  'text/html'
-]);
-
-const TARGET_HEADERS = new Set(['Received', 'From', 'To']);
+const {
+  EMAIL_SCAN: {
+    TARGET_MIME_TYPES,
+    TARGET_HEADERS
+  }  
+} = CONSTANTS;
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
@@ -39,20 +39,11 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     console.log('refreshing token before email scan...');
     refreshedToken = await refreshToken(credentialsObject, token, userId);
 
-    // console.log('old token', token['access_token']);
-    // console.log("refreshedToken['access_token']", refreshedToken['access_token']);
     await pgFunctions.insertRefreshedToken(refreshedToken, userId);
   } else {
     refreshedToken = token;
   }
 
-  if (!refreshedToken) {
-  	console.error('no refresh token');
-  } else {
-    console.log('refreshed token:', refreshedToken);
-  }
-
-  // implement API call to get emails here
   const { response, statusCode, error } = await listGmailMessages(refreshedToken);
 
   const { messages } = response;
@@ -62,13 +53,11 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     process.exit(1);
   }
 
-  console.log('response\'s statusCode:', statusCode);
-  console.log('response', messages);
-
   const messagePromises = messages.map(({ id }) => getGmailMessageById(refreshedToken, id));
   
   let messageObjects;
   try {
+    console.log('waiting for all getGmailMessageById api calls to finish...');
     messageObjects = await Promise.all(messagePromises);
   } catch (err) {
     console.error(err.message);
@@ -107,14 +96,12 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const relevantBodyParts = partsArray.reduce((accumulator, bodyObject) => {
     const { body, mimeType } = bodyObject;
 
-    // console.log(body);
+    // const buffer = Buffer.from(body.data, 'base64');
+    // const text = buffer.toString();
 
-    const buffer = Buffer.from(body.data, 'base64');
-    const text = buffer.toString();
+    const text = decodeBase64String(body.data);
 
-    // console.log('accumulator', accumulator);
     if (TARGET_MIME_TYPES.has(mimeType)) {
-      // TODO - maybe scan through the parts.body first?
       accumulator.push(text);
       return accumulator;
     }
