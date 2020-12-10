@@ -20,6 +20,25 @@ const {
   },
 } = CONSTANTS;
 
+const extractDateStringFromReceivedHeader = str => {
+  const semiColonIndex = str.indexOf(';');
+  const size = str.length;
+  const dateBegin = str.slice(semiColonIndex + 1, size).trim();
+
+  // TODO - does moment.js need the whole string?
+  const hyphenIndex = dateBegin.indexOf('-');
+  const plusIndex = dateBegin.indexOf('+');
+
+  let sliced = dateBegin;
+  if (hyphenIndex > -1) {
+    sliced = sliced.slice(0, hyphenIndex);
+  } else if (plusIndex > -1) {
+    sliced = sliced.slice(0, plusIndex);
+  }
+
+  return sliced.trim();
+};
+
 const buildEmailFormatMapper = contextObject => ({ response }) => {
   const {
     TARGET_HEADERS_SET,
@@ -37,12 +56,25 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
   const relevantHeaders = headers.reduce((headerMap, headerObject, index) => {
     const { name, value } = headerObject;
     
+    // TODO - write a helper function extractTimeFromReceivedheader to create a new key, 'timeReceived'
+    // `string.slice(indexof(';'), string.length).trim()` might work!
+
     if (TARGET_HEADERS_SET.has(name)) {
       // if (name === RECEIVED) {
       //   headerMap[`${name}_${index}`] = value;    
       // } else {
       //   headerMap[name] = value;
       // }
+
+      if (name === RECEIVED) {
+        // const semiColonIndex = value.indexOf(';');
+        // const size = value.length;
+        // const date = value.slice(semiColonIndex + 1, size).trim();
+
+        dateString = extractDateStringFromReceivedHeader(value);
+        headerMap.date = dateString;
+      }
+
       headerMap[name] = value;
       return headerMap;
     }
