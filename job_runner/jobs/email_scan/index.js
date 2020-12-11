@@ -158,9 +158,15 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     decodeBase64String
   });
 
-  const formattedEmails = messageObjects.map(emailFormatMapper);
-
-  console.log('formattedEmails[0]', formattedEmails[0]);
+  const formattedEmailObjects = messageObjects.map(emailFormatMapper);
+  const accumulator = {
+    
+  };
+  
+  const dbOptionsObject = formattedEmailObjects.reduce((accumulationObject, emailObject) => {
+    const { } = accumulationObject;
+    const { } = emailObject;
+  }, accumulator);
 
   process.exit(0);
 };
