@@ -18,6 +18,7 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
-    "jest": "^26.4.2"
+    "jest": "^26.4.2",
+    "moment": "^2.29.1"
   }
 }

@@ -11,5 +11,7 @@ server/public
 job_runner/lib
 server/credentials.json
 server/token.json
+server/backup_credentials.json
+server/backup_token.json
 zGitStatus.sh
 zOpenVsCode.sh

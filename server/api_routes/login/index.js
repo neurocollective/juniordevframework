@@ -73,7 +73,7 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
     if (REDIRECT_AUTH_URLS) {
       return res.redirect('/?loggedin=true');
     }
-    return res.status(200).json({ authorized: true }); 
+    return res.status(200).json({ authorized: true });
   });
 
   return loginRouter;

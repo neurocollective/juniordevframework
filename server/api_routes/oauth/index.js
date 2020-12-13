@@ -71,6 +71,8 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
     if (getProfileError || Number(gmailStatusCode) > 399) {
       // still store token as orphaned? orphaned_oauth_token create-query exists
       const error = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
+      // console.error('getProfileError', getProfileError);
+      console.error('gmailStatusCode', gmailStatusCode);
       return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
     }
 
