@@ -99,8 +99,29 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
 
   return {
     headers: relevantHeaders,
-    bodyParts: relevantBodyParts
+    body: relevantBodyParts.join('')
   }
+};
+
+const buildEmailReducer = context => (accumulationObject, emailObject) => {
+  const {
+    test
+  } = context;
+  const {
+    testy
+  } = accumulationObject;
+  const {
+    headers: {
+      date,
+      From: sentBy,
+      To: to,
+    },
+    body: emailBody
+  } = emailObject;
+
+  return {
+    ...accumulationObject
+  };
 };
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
@@ -159,14 +180,21 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   });
 
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
+
+  // console.log('formattedEmailObjects[0]', formattedEmailObjects[0]);
+
   const accumulator = {
-    
+    messagesOnEdgeDate: [],
+    newContacts: [],
+    existingContacts: {}
   };
+
+  // TODO - get existing contact info for user from DB, insert into context
+  const context = {};
+
+  const emailReducer = buildEmailReducer(context);
   
-  const dbOptionsObject = formattedEmailObjects.reduce((accumulationObject, emailObject) => {
-    const { } = accumulationObject;
-    const { } = emailObject;
-  }, accumulator);
+  const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
   process.exit(0);
 };
