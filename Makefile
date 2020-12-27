@@ -6,7 +6,7 @@ redis:
 postgres:
 	docker run --name junior_dev_framework_dev_postgres -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 seed:
-	SCHEMA_VERSION=v1 node -e "const c = require('./server/lib/postgres/connector.js'); c.insertAndSeed();"
+	SCHEMA_VERSION=v2 node -e "const c = require('./server/lib/postgres/connector.js'); c.insertAndSeed();"
 db:
 	make postgres
 	sleep 2
@@ -27,14 +27,14 @@ test:
 serve:
 	make library
 	# LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
-	LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
+	SCHEMA_VERSION=v2 LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
 library:
 # 	cp -r ./lib/ ./server/
 # 	cp -r ./lib/ ./ui/src/
 # 	cp -r ./lib/ ./job_runner/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./ui/src/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./server/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./job_runner/
+	rsync -r --exclude="node_modules" --include="*.js" --include="*/" --exclude="*" ./lib ./ui/src/
+	rsync -r --exclude="node_modules" --include="*.js" --include="*/" --exclude="*" ./lib ./server/
+	rsync -r --exclude="node_modules" --include="*.js" --include="*/" --exclude="*" ./lib ./job_runner/
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 install:
