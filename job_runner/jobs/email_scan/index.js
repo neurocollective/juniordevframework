@@ -184,8 +184,13 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
   console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
 
+  const { rows: allEntities } = await pgFunctions.getAllJobEntities();
+
+  console.log('allEntities.length', allEntities.length);
+
   const accumulator = {
     messagesOnEdgeDate: [],
+    newEntities: [],
     newContacts: [],
     existingContacts: {}
   };
