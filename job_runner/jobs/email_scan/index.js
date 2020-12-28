@@ -181,7 +181,8 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
 
-  // console.log('formattedEmailObjects[0]', formattedEmailObjects[0]);
+  console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
+  console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
 
   const accumulator = {
     messagesOnEdgeDate: [],
