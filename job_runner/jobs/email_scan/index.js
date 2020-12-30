@@ -196,11 +196,20 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   };
 
   // TODO - get existing contact info for user from DB, insert into context
-  const context = {};
+  const context = {
+    allEntities
+  };
 
   const emailReducer = buildEmailReducer(context);
   
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
+
+  const {
+    messagesOnEdgeDate = [],
+    newEntities = [],
+    newContacts = [],
+    existingContacts = {}
+  } = accumulator;
 
   process.exit(0);
 };
