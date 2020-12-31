@@ -6,7 +6,7 @@ const {
   insertRefreshedToken,
   decodeBase64String,
   CONSTANTS
-} = require('../../lib');
+} = require('../../../lib');
 
 const {
   EMAIL_SCAN: {

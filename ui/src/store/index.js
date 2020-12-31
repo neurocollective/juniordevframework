@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { UI_CONSTANTS } from '../lib/constants';
+import { UI_CONSTANTS } from '../../../lib/constants';
 
 const {
   PAGES: {

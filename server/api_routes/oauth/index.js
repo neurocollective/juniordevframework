@@ -6,7 +6,7 @@ const {
   isTokenExpiredByAPICheck,
   getAuthUrlFromCredentials,
   createSessionCookie
-} = require('../../lib');
+} = require('../../../lib');
 const {
   // MIDDLEWARE: {
   //   REDIRECT_URL
@@ -15,7 +15,7 @@ const {
     KEY: COOKIE_KEY,
     COOKIE_MAX_AGE
   }
-} = require('../../lib/constants');
+} = require('../../../lib/constants');
 
 // const  {
 //   env: {
