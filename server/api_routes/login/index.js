@@ -8,12 +8,12 @@ const {
   isTokenExpiredByAPICheck,
   getAuthUrlFromCredentials,
   getAuthURLAndSendRedirectJSON
-} = require('../../lib');
+} = require('../../../lib');
 const {
   MIDDLEWARE: {
     REDIRECT_URL
   }
-} = require('../../lib/constants');
+} = require('../../../lib/constants');
 
 const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 

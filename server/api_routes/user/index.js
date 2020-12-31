@@ -5,11 +5,11 @@ const {
 		COOKIE_MAX_AGE,
 		KEY: COOKIE_KEY
 	}
-} = require('../../lib/constants');
+} = require('../../../lib/constants');
 const {
 	createSessionCookie,
 	getAuthURLAndSendRedirectJSON
-} = require('../../lib');
+} = require('../../../lib');
 // const  {
 //   env: {
 //     REDIRECT_AUTH_URLS: redirectEnvValue = ''

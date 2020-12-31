@@ -1,5 +1,4 @@
 vue:
-	make library
 	npm run serve --prefix ./ui
 redis:
 	docker run --name junior_dev_framework_dev_redis -p 6379:6379 -d redis  
@@ -17,23 +16,14 @@ wake/db:
 	docker start junior_dev_framework_dev_redis
 wake:
 	make wake/db
-	make library
 test:
 	npm t --prefix ./lib
 	npm t --prefix ./job_runner
 	# npm t --prefix ./server
 	# npm run test:unit  --prefix ./ui
 serve:
-	make library
 	# LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
 	LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
-library:
-# 	cp -r ./lib/ ./server/
-# 	cp -r ./lib/ ./ui/src/
-# 	cp -r ./lib/ ./job_runner/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./ui/src/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./server/
-	rsync -r --exclude="node_modules" --include="*.js"  --include="*/" --exclude="*" ./lib ./job_runner/
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 install:
@@ -41,7 +31,6 @@ install:
 	npm i --prefix ./ui
 	npm i --prefix ./job_runner
 	npm i --prefix ./lib # only installs jest TODO - can we remove dependencies and package.json from /lib?
-	make library
 images:
 	docker build -t junior_dev_framework_server:latest ./server
 backend:

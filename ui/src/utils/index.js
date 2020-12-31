@@ -1,4 +1,4 @@
-import CONSTANTS from '../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 
 const {
   MIDDLEWARE: {

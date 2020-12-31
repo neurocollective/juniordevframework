@@ -1,4 +1,4 @@
-const { refreshToken } = require('../lib');
+const { refreshToken } = require('../../../lib');
 
 const scanEmails = (pgFunctions, redisFunctions, userId) => {
   
@@ -22,11 +22,11 @@ const scanEmails = (pgFunctions, redisFunctions, userId) => {
   // 	} = {},
   // } = CREDENTIALS;
 
-  const refreshToken = await refreshToken(credentialsObject, token, uerId);
+  const token = await refreshToken(credentialsObject, token, uerId);
 
   // TODO - store refesToken
 
-  if (!refreshToken) {
+  if (!token) {
   	console.error('no refresh');
   }
 

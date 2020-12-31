@@ -66,9 +66,9 @@
 
 <script>
   import router from './router';
-  import CONSTANTS from './lib/constants';
+  import CONSTANTS from '../../lib/constants';
   import { buildFetchJsonOrRedirect } from './utils';
-  import { adjustStateToLoadingPath } from './lib';
+  import { adjustStateToLoadingPath } from '../../lib';
 
   const {
     UI_CONSTANTS,

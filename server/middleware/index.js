@@ -15,11 +15,11 @@ const {
   ROUTING: {
     SLASH_LOGIN
   }
-} = require('../lib/constants');
+} = require('../../lib/constants');
 const {
   isTokenExpiredByAPICheck,
   getAuthUrlFromCredentials
-} = require('../lib');
+} = require('../../lib');
 
 let local = false;
 if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
