@@ -25,7 +25,7 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
     const { rows: [user] } = await dbFunctions.getUserIdForEmail(email);
 
     if (!user) {
-      const error = 'no user for that email';
+      const error = 'No user for that email';
 
       if (REDIRECT_AUTH_URLS) {
         return res.redirect(`/?code=401&error=${error.split(' ').join('+')}`);

@@ -1,124 +1,45 @@
 <template>
-  <div>
-<!--      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-<!--     <span>
-      Home
-    </span>
-    <md-button class="md-primary" @click="this.handleClick">CLICK</md-button> -->
-    Home
-<!--     <div>
-      <md-toolbar>
-        <md-button class="md-icon-button" @click="toggleMenu">
-          <md-icon>menu</md-icon>
-        </md-button>
-        <span class="md-title">{{this.appName}}</span>
-      </md-toolbar>
+  <main class="md-layout">
+    <h1>Home</h1>
+    <p>
+      Bacon ipsum dolor amet t-bone burgdoggen rump turkey beef shankle pork belly ground round
+      chislic spare ribs. Venison pork chop salami, turducken short ribs ground round landjaeger
+      turkey cow pork belly burgdoggen corned beef beef kielbasa. Pork chop brisket prosciutto
+      rump t-bone strip steak tongue. Ground round porchetta chislic t-bone andouille.
+    </p>
 
-      <md-drawer :md-active.sync="this.showMenu" md-swipeable>
+    <p>
+      Boudin biltong pork, sirloin beef turkey pork belly chicken leberkas jerky kevin flank.
+      Tenderloin capicola landjaeger, tongue salami leberkas ground round hamburger tail pig
+      strip steak flank turducken rump ribeye. Ball tip meatloaf picanha jowl andouille pork
+      loin drumstick rump salami tenderloin. Meatball sirloin prosciutto, capicola turkey beef
+      ribs hamburger tongue andouille filet mignon. Shoulder turkey porchetta prosciutto ribeye
+      capicola salami jowl shankle ham hock bacon.
+    </p>
 
-        <div class="md-toolbar-section-end">
-          <md-button class="md-icon-button md-dense" @click="this.toggleMenu">
-            <md-icon>keyboard_arrow_left</md-icon>
-          </md-button>
-        </div>
-        <md-toolbar class="md-transparent" md-elevation="0">
-          <span class="md-title">MENU</span>
-        </md-toolbar>
+    <p>
+      Biltong pork belly shankle venison pork loin beef ribs. Filet mignon shank frankfurter
+      sirloin ribeye swine. Ham hock capicola beef ribs, chuck chislic swine flank bresaola.
+      Pastrami cupim pork chop short ribs chislic ham hock shank leberkas pork belly pork
+      flank andouille. Bacon venison jerky, short ribs fatback turducken boudin frankfurter biltong.
+    </p>
 
-        <md-list>
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToHome">
-              <md-icon>home</md-icon>
-            </md-button>
-            <span class="md-list-item-text">Home</span>
-          </md-list-item>
-
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToContacts">
-              <md-icon>contact_mail</md-icon>
-            </md-button>
-            <span class="md-list-item-text">Contacts</span>
-          </md-list-item>
-
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToToDos">
-              <md-icon>list</md-icon>
-            </md-button>
-            <span class="md-list-item-text">To Do</span>
-          </md-list-item>
-
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToResults">
-              <md-icon>leaderboard</md-icon>
-            </md-button>
-            <span class="md-list-item-text">Results</span>
-          </md-list-item>
-
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToAccount">
-              <md-icon>settings</md-icon>
-            </md-button>
-            <span class="md-list-item-text">Account</span>
-          </md-list-item>
-        </md-list>
-      </md-drawer>
-    </div> -->
-  </div>
+    <p>
+      Salami porchetta short ribs burgdoggen cupim. Doner pig cupim, flank alcatra drumstick
+      salami andouille ham ground round. Tenderloin pancetta boudin pork belly, turkey biltong
+      kevin shoulder tri-tip. Landjaeger swine tri-tip t-bone cupim shankle sirloin sausage
+      pastrami venison. Leberkas strip steak chislic, tri-tip ball tip ham short ribs tenderloin
+      short loin capicola. Chuck brisket short ribs jowl ham.
+    </p>
+  </main>
 </template>
 
 <script>
   export default {
     name: 'Home',
-    // methods: {
-    //   // handleClick() {
-    //   //   console.log('clicky');
-    //   // },
-    //   toggleMenu() {
-    //     this.$store.dispatch('toggleMenu');
-    //   },
-    //   goToHome() {
-    //     this.$store.dispatch('goHome');
-    //   },
-    //   goToAccount() {
-    //     this.$store.dispatch('goToAccount');
-    //   },
-    //   goToResults() {
-    //     this.$store.dispatch('goToResults');
-    //   },
-    //   goToToDos() {
-    //     this.$store.dispatch('goToToDos');
-    //   },
-    //   goToContacts() {
-    //     this.$store.dispatch('goToContacts');
-    //   }
-    // },
-    // data() {
-    //   return {
-    //     appName: 'Junior Dev Framework'
-    //   };
-    // },
-    // computed: {
-    //   showMenu() {
-    //     return this.$store.state.showMenu;
-    //   }
-    // }
   };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  h3 {
-    margin: 40px 0 0;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-  a {
-    color: #42b983;
-  }
 </style>

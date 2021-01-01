@@ -3,7 +3,7 @@
     <div class="md-layout-item md-large-size-33 md-small-size-100">
       <h1>Please Login</h1>
       <md-field>
-        <label>Enter your registered GMail address:</label>
+        <label>Enter your registered GMail address</label>
         <md-input v-model="email" type="text"></md-input>
       </md-field>
       <div class="md-layout md-alignment-center-center">

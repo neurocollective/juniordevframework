@@ -23,36 +23,36 @@
         </md-toolbar>
 
         <md-list>
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToHome">
+          <md-list-item @click="this.goToHome">
+            <md-button class="md-icon-button md-raised">
               <md-icon>home</md-icon>
             </md-button>
             <span class="md-list-item-text">Home</span>
           </md-list-item>
 
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToContacts">
+          <md-list-item @click="this.goToContacts">
+            <md-button class="md-icon-button md-raised">
               <md-icon>contact_mail</md-icon>
             </md-button>
             <span class="md-list-item-text">Contacts</span>
           </md-list-item>
 
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToToDos">
+          <md-list-item @click="this.goToToDos">
+            <md-button class="md-icon-button md-raised">
               <md-icon>list</md-icon>
             </md-button>
             <span class="md-list-item-text">To Do</span>
           </md-list-item>
 
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToResults">
+          <md-list-item @click="this.goToResults">
+            <md-button class="md-icon-button md-raised">
               <md-icon>leaderboard</md-icon>
             </md-button>
             <span class="md-list-item-text">Results</span>
           </md-list-item>
 
-          <md-list-item>
-            <md-button class="md-icon-button md-raised" @click="this.goToAccount">
+          <md-list-item @click="this.goToAccount">
+            <md-button class="md-icon-button md-raised">
               <md-icon>settings</md-icon>
             </md-button>
             <span class="md-list-item-text">Account</span>
