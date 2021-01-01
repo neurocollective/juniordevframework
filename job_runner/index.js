@@ -27,14 +27,14 @@ const {
 
 const main = async () => {
   if (!userId) {
-    console.error(`userId must be passed as an environment variable`);
+    console.error('userId must be passed as an environment variable');
     process.exit(1);
   }
   const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
   const {
     dbConnection: connectionString = '',
-    tlsKeyPath,
-    tlsCertPath,
+    // tlsKeyPath,
+    // tlsCertPath,
   } = CONFIG;
 
   const pgFunctions = await bootstrapPostgresFunctions(Client, connectionString);
@@ -45,9 +45,9 @@ const main = async () => {
 
   const redisFunctions = bootstrapRedisFunctions(redisClient);
 
-  const [,,command] = process.argv;
+  const [,, command] = process.argv;
 
-  switch(command) {
+  switch (command) {
     case JOB_COMMAND_CREATE_USER_LISTINGS: {
       return createUserListings(pgFunctions);
     }
@@ -58,7 +58,7 @@ const main = async () => {
       console.error(`command ${command} not found, exiting.`);
     }
   }
-
+  return 0;
 };
 
 main();
