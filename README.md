@@ -78,7 +78,7 @@ https: `https://github.com/neurocollective/juniordevframework.git`
 	"installed": {
 		"client_secret": "$paste_your_client_secret",
 		"client_id": "$paste_your_client_id", 
-		"redirect_uris": ["http://localhost:8080/oauth"]
+		"redirect_uris": ["http://localhost:3000/api/oauth"]
 	}
 }
 ```

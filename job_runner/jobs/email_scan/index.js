@@ -181,20 +181,35 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
 
-  // console.log('formattedEmailObjects[0]', formattedEmailObjects[0]);
+  console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
+  console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
+
+  const { rows: allEntities } = await pgFunctions.getAllJobEntities();
+
+  console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
     messagesOnEdgeDate: [],
+    newEntities: [],
     newContacts: [],
     existingContacts: {}
   };
 
   // TODO - get existing contact info for user from DB, insert into context
-  const context = {};
+  const context = {
+    allEntities
+  };
 
   const emailReducer = buildEmailReducer(context);
   
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
+
+  const {
+    messagesOnEdgeDate = [],
+    newEntities = [],
+    newContacts = [],
+    existingContacts = {}
+  } = accumulator;
 
   process.exit(0);
 };

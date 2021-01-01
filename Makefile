@@ -5,7 +5,7 @@ redis:
 postgres:
 	docker run --name junior_dev_framework_dev_postgres -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 seed:
-	node -e "const c = require('./lib/postgres/connector.js'); c.insertAndSeed();"
+	SCHEMA_VERSION=v2 node -e "const c = require('./lib/postgres/connector.js'); c.insertAndSeed();"
 db:
 	make postgres
 	sleep 2
@@ -24,7 +24,7 @@ test:
 	# npm run test:unit  --prefix ./ui
 serve:
 	# LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
-	LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
+	SCHEMA_VERSION=v2 LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 install:
