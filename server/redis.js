@@ -2,13 +2,13 @@ const redis = require('redis');
 
 const client = redis.createClient();
 
-client.on('connect', function() {
+client.on('connect', () => {
   console.log('connected');
 });
 
 client.set('framework', 'AngularJS');
 
-client.get('framework', function(err, reply) {
+client.get('framework', (err, reply) => {
   console.log(`framework: ${reply}`);
   process.exit(0);
 });

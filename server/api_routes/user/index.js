@@ -1,15 +1,8 @@
 const { Router } = require('express');
-const { v4: uuid } = require('uuid');
 const moment = require('moment');
 const {
-	COOKIES: {
-		COOKIE_MAX_AGE,
-		KEY: COOKIE_KEY
-	}
-} = require('../../../lib/constants');
-const {
-	createSessionCookie,
-	getAuthURLAndSendRedirectJSON
+  createSessionCookie,
+  getAuthURLAndSendRedirectJSON
 } = require('../../../lib');
 // const  {
 //   env: {
@@ -20,55 +13,53 @@ const {
 // const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 
 const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
+  const userRouter = Router();
 
-	const userRouter = Router();
+  userRouter.post('/new', async (req, res) => {
+    const {
+      body: {
+        email,
+        firstName,
+        lastName
+      }
+    } = req;
 
-	userRouter.post('/new', async (req, res) => {
+    console.log('sent:', email, firstName, lastName);
+    if (!email) {
+      return res.status(500).json({ error: 'email required' });
+    }
 
-		const {
-			body: {
-				email,
-				firstName,
-				lastName
-			}
-		} = req;
+    await dbFunctions.beginTransaction();
 
-		console.log('sent:', email, firstName, lastName);
-		if (!email) {
-			return res.status(500).json({ error: 'email required' });
-		}
+    let userId;
+    try {
+      const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
+      ({ id: userId } = newUser);
+    } catch (err) {
+      console.error('signup error:', err);
+      const failMessage = 'could not create new user';
+      await dbFunctions.rollbackTransaction();
+      return res.status(500).json({ error: failMessage });
+    }
 
-		await dbFunctions.beginTransaction();
+    try {
+      const nowEpoch = moment().unix();
+      /* const insertEmailScanRecordQuery = */ dbFunctions.insertEmailScanRecord(userId, nowEpoch);
+    } catch (err) {
+      console.error('create email scan record query error:', err);
+      await dbFunctions.rollbackTransaction();
+      return res.status(500).json({ error: err });
+    }
 
-		let userId;
-		try {
-			const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
-			({ id: userId } = newUser);
-		} catch (err) {
-			console.error('signup error:', err);
-			const failMessage = 'could not create new user';
-			await dbFunctions.rollbackTransaction();
-			return res.status(500).json({ error: failMessage });
-		}
+    await dbFunctions.commitTransaction();
 
-		try {
-			const nowEpoch = moment().unix();
-			const insertEmailScanRecordQuery = dbFunctions.insertEmailScanRecord(userId, nowEpoch);
-		} catch (err) {
-			console.error('create email scan record query error:', err);
-			await dbFunctions.rollbackTransaction();
-			return res.status(500).json({ error: failMessage });
-		}
+    await createSessionCookie(res, redisFunctions, userId);
 
-		await dbFunctions.commitTransaction();
+    const contextObject = { credentialsObject, userId, email };
+      return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
+  });
 
-		await createSessionCookie(res, redisFunctions, userId);
-
-		const contextObject = { credentialsObject, userId, email };
-    	return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
-	});
-
-	return userRouter;
+  return userRouter;
 };
 
 module.exports = getUserRouter;
