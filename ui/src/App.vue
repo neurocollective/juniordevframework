@@ -60,7 +60,9 @@
         </md-list>
       </md-drawer>
     </div>
-    <div v-if="!this.pageLoadError" :is="this.router[this.currentComponent]"></div>
+    <div class="app-wrapper">
+      <div v-if="!this.pageLoadError" :is="this.router[this.currentComponent]"></div>
+    </div>
   </div>
 </template>
 
@@ -228,5 +230,8 @@
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  .app-wrapper {
+    padding: 20px;
   }
 </style>

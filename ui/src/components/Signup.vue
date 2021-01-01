@@ -1,23 +1,26 @@
 <template>
-  <main>
-    <h1>Signup</h1>
-    <div class="signup-container">
-      <div v-if="this.error" class="error-box">
-        {{ this.error }}
-      </div>
+  <main class="md-layout md-alignment-center">
+    <div class="md-layout-item md-large-size-33 md-small-size-100">
+      <h1>Signup</h1>
       <div>
-        <label>Gmail account you want to use:</label>
-        <input type="text" v-bind:value="this.email" v-on:input="this.handleEmailInput">
+        <div v-if="this.error" class="error-box">
+          {{ this.error }}
+        </div>
+        <md-field>
+          <label>GMail address you want to use</label>
+          <md-input type="text" v-bind:value="this.email" v-on:input="this.handleEmailInput" />
+        </md-field>
+        <md-field>
+          <label>First Name</label>
+          <md-input type="text" v-bind:value="this.firstName"
+            v-on:input="this.handleFirstNameInput" />
+        </md-field>
+        <md-field>
+          <label>Last Name</label>
+          <md-input type="text" v-bind:value="lastName" v-on:input="this.handleLastNameInput" />
+        </md-field>
+        <md-button @click="handleSignup" class="md-raised md-primary">Signup</md-button>
       </div>
-      <div>
-        <label>first name</label>
-        <input type="text" v-bind:value="this.firstName" v-on:input="this.handleFirstNameInput">
-      </div>
-      <div>
-        <label>last name</label>
-        <input type="text" v-bind:value="lastName" v-on:input="this.handleLastNameInput">
-      </div>
-      <button @click="handleSignup">Signup</button>
     </div>
   </main>
 </template>
@@ -114,19 +117,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .todos-container {
-  }
-
-  .signup-container {
-    border: 1px solid black;
-    border-radius: 5px;
-    max-width: 50%;
-    margin: 5px auto;
-    padding: 10px;
-/*    display: flex;
-    justify-content: center;*/
-  }
-
   .error-box {
     color: red;
   }
