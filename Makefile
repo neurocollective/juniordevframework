@@ -5,7 +5,7 @@ redis:
 postgres:
 	docker run --name junior_dev_framework_dev_postgres -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 seed:
-	node -e "const c = require('./server/lib/postgres/connector.js'); c.insertAndSeed();"
+	node -e "const c = require('./lib/postgres/connector.js'); c.insertAndSeed();"
 db:
 	make postgres
 	sleep 2

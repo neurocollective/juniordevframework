@@ -12,5 +12,8 @@
   "devDependencies": {
     "cryptr": "^6.0.2",
     "jest": "^26.4.2"
+  },
+  "dependencies": {
+    "pg": "^8.5.1"
   }
 }
