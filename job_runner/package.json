@@ -6,8 +6,8 @@
   "scripts": {
     "serve": "node -e \"const bootServer = require('./jobs/email_scan/server.js'); bootServer();\"",
     "test": "jest ./jobs",
-    "lint": "eslint \"./**/*.js\" --quiet",
-    "lint:fix": "eslint \"./**/*.js\" --fix --quiet"
+    "lint": "eslint \"./**/*.js\"",
+    "lint:fix": "eslint \"./**/*.js\" --fix"
   },
   "keywords": [],
   "author": "",

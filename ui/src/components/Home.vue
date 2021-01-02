@@ -35,9 +35,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'Home',
-  };
+export default {
+  name: 'Home',
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
