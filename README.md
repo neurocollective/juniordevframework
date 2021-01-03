@@ -105,7 +105,7 @@ Some useful commands:
 
 #### `make wake`
 
-Run this after startup, updates your library folders and starts the postgres && redis containers.
+Run this after startup, starts the postgres && redis containers.
 
 #### `make psql`
 
@@ -130,10 +130,6 @@ Further, the project is still just a shadow of its future self, so do keep in mi
 - How do I make a Pull Request?
 
 That's So Fullstack! Fork this repo, and make a branch on your fork. Make some changes, then create a Pull Request that targets the `master` branch of this main ("upstream") repo.
-
-- I am making changes to `lib` files but nothing happens!
-
-Run `make library` to propagate changes in the `lib` folder. A server run script in the future should automate this.
 
 - Am I too new / junior / inexperienced to contribute to this project?
 

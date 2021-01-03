@@ -6,14 +6,14 @@ const redis = require('redis');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 // const { v4: uuid } = require('uuid');
-const buildCryptr = require('./lib/encryption');
+const buildCryptr = require('../lib/encryption');
 const getAPIRoutes = require('./api_routes');
 const {
   bootstrapPostgresFunctions
-} = require('./lib/postgres');
+} = require('../lib/postgres');
 const {
   bootstrapRedisFunctions
-} = require('./lib/redis');
+} = require('../lib/redis');
 
 const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
 

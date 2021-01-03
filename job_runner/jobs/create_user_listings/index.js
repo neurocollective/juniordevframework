@@ -1,7 +1,7 @@
 const {
   buildInsertQueryFromListings,
   insertUserListingsFromGeneratedQuery
-} = require('../../lib/postgres');
+} = require('../../../lib/postgres');
 
 const buildExistingListingsForUserMap = (userListingObjects) => userListingObjects.reduce((map, userListingObject) => {
     // console.log('userListingObject:', userListingObject);

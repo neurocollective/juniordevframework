@@ -21,7 +21,7 @@
 
 <script>
 import { buildFetchJsonOrRedirect } from '../utils';
-import { UI_CONSTANTS } from '../lib/constants';
+import { UI_CONSTANTS } from '../../../lib/constants';
 
 const {
   ACTION_TYPES: {
