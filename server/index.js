@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 const cors = require('cors');
 const { Client } = require('pg');
@@ -6,7 +7,6 @@ const redis = require('redis');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 // const { v4: uuid } = require('uuid');
-const buildCryptr = require('../lib/encryption');
 const getAPIRoutes = require('./api_routes');
 const {
   bootstrapPostgresFunctions
@@ -34,13 +34,14 @@ const {
   argv
 } = process;
 
-const useHTTP = !argv.find(arg => arg.includes("--http"));
+const useHTTP = !argv.find((arg) => arg.includes('--http'));
 
 const HTTP_PORT = 80;
 const HTTPS_PORT = 443;
 let {
   env: {
     PORT = 3000,
+    // eslint-disable-next-line prefer-const
     LOCAL_MODE
   }
 } = process;
@@ -51,9 +52,9 @@ if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
 }
 
 if (local) {
-  console.log("Server starting in local mode.");
-  console.log("Warning: local mode means some critical security features are OFF.");
-  console.log("DO NOT expose local mode to public internet traffic!");
+  console.log('Server starting in local mode.');
+  console.log('Warning: local mode means some critical security features are OFF.');
+  console.log('DO NOT expose local mode to public internet traffic!');
 }
 
 if (!useHTTP && !local) {
@@ -73,12 +74,12 @@ if (useTLS) {
 }
 
 const bootServer = async () => {
-
   const { rows: [credentials] } = await postgresFunctions.getCredentials();
   console.log('credentials', credentials);
 
   // parsing middleware
-  // TODO - this could be more targeted in middleware/index.js? Avoiding unnecessary middleware could give small performance boost
+  // TODO - this could be more targeted in middleware/index.js?
+  // Avoiding unnecessary middleware could give small performance boost
   app.use((req, res, next) => {
     console.log('sanity check middleware');
     return next();
@@ -110,19 +111,19 @@ const bootServer = async () => {
   // console.log(redisFunctions);
   app.use('/api', getAPIRoutes(postgresFunctions, redisFunctions, credentials));
 
-  let listener;
   if (useTLS) {
+    // eslint-disable-next-line global-require
     const https = require('https');
-    listener = https.createServer(optionsForTLS, app).listen(HTTPS_PORT, () => {
-      console.log('Express HTTPS server listening on port ' + HTTPS_PORT);
+    https.createServer(optionsForTLS, app).listen(HTTPS_PORT, () => {
+      console.log(`Express HTTPS server listening on port ${HTTPS_PORT}`);
     });
   } else {
+    // eslint-disable-next-line global-require
     const http = require('http');
-    listener = http.createServer(app).listen(PORT, () => {
-      console.log('Express HTTP server listening on port ' + PORT);
+    http.createServer(app).listen(PORT, () => {
+      console.log(`Express HTTP server listening on port ${PORT}`);
     });
   }
-
 };
 
 module.exports = bootServer;

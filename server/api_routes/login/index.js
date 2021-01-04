@@ -1,27 +1,21 @@
 const { Router } = require('express');
-const  {
+
+const {
   env: {
     REDIRECT_AUTH_URLS: redirectEnvValue = ''
   }
 } = process;
 const {
   isTokenExpiredByAPICheck,
-  getAuthUrlFromCredentials,
   getAuthURLAndSendRedirectJSON
 } = require('../../../lib');
-const {
-  MIDDLEWARE: {
-    REDIRECT_URL
-  }
-} = require('../../../lib/constants');
 
-const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
+const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() === 'true';
 
 const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
   const loginRouter = Router();
 
   loginRouter.post('/', async (req, res) => {
-
     const {
       body: {
         email
@@ -32,7 +26,7 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 
     if (!user) {
       const error = 'no user for that email';
-      
+
       if (REDIRECT_AUTH_URLS) {
         return res.redirect(`/?code=401&error=${error.split(' ').join('+')}`);
       }
@@ -69,7 +63,7 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
       const contextObject = { credentialsObject, id, email };
       return getAuthURLAndSendRedirectJSON(res, contextObject, 401);
     }
-      
+
     if (REDIRECT_AUTH_URLS) {
       return res.redirect('/?loggedin=true');
     }

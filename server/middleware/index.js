@@ -34,7 +34,6 @@ if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
 // const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 
 const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObject) => {
-
   // const { getUserIdForCookie, mapCookieAndUserId } = redisFunctions;
 
   const checkForValidSession = async (req, res, next) => {
@@ -74,7 +73,7 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
     let accessToken;
     try {
       const { rows } = await postgresFunctions.getOAuthTokenForUserId(userId);
-      ([ { access_token: accessToken  } = {} ] = rows);
+      ([{ access_token: accessToken } = {}] = rows);
     } catch (err) {
       console.error(`checkForValidToken got error ${err.message}`);
 

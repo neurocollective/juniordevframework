@@ -3,19 +3,8 @@ const { Router } = require('express');
 const {
   getGmailProfile,
   requestToken,
-  isTokenExpiredByAPICheck,
-  getAuthUrlFromCredentials,
   createSessionCookie
 } = require('../../../lib');
-const {
-  // MIDDLEWARE: {
-  //   REDIRECT_URL
-  // },
-  COOKIES: {
-    KEY: COOKIE_KEY,
-    COOKIE_MAX_AGE
-  }
-} = require('../../../lib/constants');
 
 // const  {
 //   env: {
@@ -26,26 +15,21 @@ const {
 // const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() == 'true' ? true : false;
 
 const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
-
   const oAuthRouter = Router();
 
-  // this route MUST redirect, as browser is sent here from google. No vue app will be loaded to handle JSON
+  // this route MUST redirect, as browser is sent here from google.
+  // No vue app will be loaded to handle JSON
   oAuthRouter.get('/', async (req, res) => {
-
     console.log('/api/oauth');
     const {
       query: {
         code,
-        scope,
-        state
       },
-      cookies
     } = req;
 
     let token;
     let error;
     let statusCode;
-    let requestError;
     try {
       ({ response: token, error, statusCode } = await requestToken(credentialsObject, code));
     } catch (err) {
@@ -55,7 +39,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
     console.log('statusCode from requestToken response:', statusCode);
     console.log('token.refresh_token', token.refresh_token);
 
-    if (error || !token || !token['access_token']) {
+    if (error || !token || !token.access_token) {
       const errorMessage = `token not retrieved! statusCode from google: ${statusCode}, error: ${error}`;
       console.error('line 57 error:', errorMessage);
       console.error('token', token);
@@ -66,14 +50,14 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
       statusCode: gmailStatusCode,
       error: getProfileError,
       response
-    } = await getGmailProfile(token['access_token']);
+    } = await getGmailProfile(token.access_token);
 
     if (getProfileError || Number(gmailStatusCode) > 399) {
       // still store token as orphaned? orphaned_oauth_token create-query exists
-      const error = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
+      const errorMessage = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
       // console.error('getProfileError', getProfileError);
       console.error('gmailStatusCode', gmailStatusCode);
-      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
+      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(errorMessage)}`);
     }
 
     const { emailAddress } = response;
@@ -82,8 +66,8 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
 
     if (getProfileError || !user) {
       // still store token as orphaned? orphaned_oauth_token create-query exists
-      const error = `/oauth found no user for email ${emailAddress}`;
-      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
+      const errorMessage = `/oauth found no user for email ${emailAddress}`;
+      return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(errorMessage)}`);
     }
 
     const { id: userId } = user;
@@ -97,9 +81,9 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
       try {
         await dbFunctions.insertToken(token, userId, now);
       } catch (err) {
-        const error = `/oauth error trying to insertToken:' ${err.message}`;
-        console.error(error);
-        return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(error)}`);
+        const errorMessage = `/oauth error trying to insertToken:' ${err.message}`;
+        console.error(errorMessage);
+        return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(errorMessage)}`);
       }
     } else {
       console.log('updating token');

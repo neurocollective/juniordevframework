@@ -1,8 +1,8 @@
 const {
   buildInsertQueryFromListings,
-  insertUserListingsFromGeneratedQuery
 } = require('../../../lib/postgres');
 
+// eslint-disable-next-line max-len
 const buildExistingListingsForUserMap = (userListingObjects) => userListingObjects.reduce((map, userListingObject) => {
     // console.log('userListingObject:', userListingObject);
     const {
@@ -12,7 +12,7 @@ const buildExistingListingsForUserMap = (userListingObjects) => userListingObjec
     // console.log('userListings:', userListings);
 
     const listingIdSet = userListings.reduce((set, userListing) => {
-      const { ['job_listing_id']: listingId } = userListing;
+      const { job_listing_id: listingId } = userListing;
       set.add(listingId);
       return set;
     }, new Set());
@@ -29,7 +29,6 @@ const buildExistingListingsForUserMap = (userListingObjects) => userListingObjec
   //   }
   //   listingIdSet.add(row['job_listing_id']);
   // return map;
-
 }, new Map());
 
 const findUserListingsToAdd = (allListings, existingListingsForUserMap /* filtersByUser */) => {
@@ -39,7 +38,7 @@ const findUserListingsToAdd = (allListings, existingListingsForUserMap /* filter
   const accumulator = { userListingsToAddMap: new Map(), existingListingsForUserMap };
 
   return allListings.reduce((accum, listing) => {
-
+    // eslint-disable-next-line no-shadow
     const { existingListingsForUserMap, userListingsToAddMap } = accum;
     const { id: listingId } = listing;
 
@@ -69,7 +68,6 @@ const syncListingsToUsers = async (pgFunctions) => {
     getAllJobListings,
     getUserListings,
     insertUserListingsFromGeneratedQuery,
-    buildGetAllUserJobFiltersByIdQuery
   } = pgFunctions;
 
   const { rows: userIds } = await getAllUserIds();
@@ -88,13 +86,14 @@ const syncListingsToUsers = async (pgFunctions) => {
   const allResults = await Promise.all(promises);
 
   const userListingsByUser = allResults.map(({ rows }, index) => {
-    return { rows, userId: indexToUserIdMap.get(index)};
+    return { rows, userId: indexToUserIdMap.get(index) };
   });
 
   // get filters for user Ids here, use 'buildGetAllUserJobFiltersByIdQuery'
 
   const existingListingsForUserMap = buildExistingListingsForUserMap(userListingsByUser);
 
+  // eslint-disable-next-line max-len
   const { userListingsToAddMap } = findUserListingsToAdd(allListings, existingListingsForUserMap/* , filtersByUser */);
 
   const query = buildInsertQueryFromListings(userListingsToAddMap);
@@ -119,6 +118,5 @@ module.exports = {
   syncListingsToUsers,
   findUserListingsToAdd,
   buildExistingListingsForUserMap,
-  syncListingsToUsers,
   createUserListings
 };

@@ -30,7 +30,6 @@ if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
 const { buildAuthMiddleware } = require('../middleware');
 
 const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
-
   const apiRouter = Router();
 
   const authMiddleware = buildAuthMiddleware(postgresFunctions, redisFunctions, credentialsObject);
@@ -40,7 +39,7 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
 
   const oauthRoutes = getOAuthRoutes(postgresFunctions, redisFunctions, credentialsObject);
   apiRouter.use(SLASH_OAUTH, oauthRoutes);
-  
+
   const pageLoadRoutes = getPageLoadRoutes(postgresFunctions, redisFunctions, credentialsObject);
   apiRouter.use(SLASH_PAGELOAD, authMiddleware, pageLoadRoutes);
 
@@ -49,7 +48,6 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
 
   // check values for given keys in redis
   if (local) {
-
     const redisRouter = Router();
 
     redisRouter.get('/get/:key', async (req, res) => {
@@ -98,7 +96,7 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
         await redisFunctions.setKeyValue(key, value);
       } catch (err) {
         console.error(err);
-        return res.json({ error: 'ruh roh' });        
+        return res.json({ error: 'ruh roh' });
       }
       return res.json({ [key]: value });
     });
@@ -109,7 +107,7 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
         keys = await redisFunctions.getAllKeys();
       } catch (err) {
         console.error('err', err);
-        return res.json({ error: 'ruh roh' });        
+        return res.json({ error: 'ruh roh' });
       }
       return res.json({ allKeys: keys });
     });

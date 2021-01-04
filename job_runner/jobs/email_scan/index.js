@@ -3,7 +3,6 @@ const {
   isTokenExpiredByAPICheck,
   listGmailMessages,
   getGmailMessageById,
-  insertRefreshedToken,
   decodeBase64String,
   CONSTANTS
 } = require('../../../lib');
@@ -14,13 +13,11 @@ const {
     TARGET_HEADERS_SET,
     HEADERS: {
       RECEIVED,
-      FROM,
-      TO
     }
   },
 } = CONSTANTS;
 
-const extractDateStringFromReceivedHeader = str => {
+const extractDateStringFromReceivedHeader = (str) => {
   const semiColonIndex = str.indexOf(';');
   const size = str.length;
   const dateBegin = str.slice(semiColonIndex + 1, size).trim();
@@ -39,29 +36,29 @@ const extractDateStringFromReceivedHeader = str => {
   return sliced.trim();
 };
 
-const buildEmailFormatMapper = contextObject => ({ response }) => {
-  const {
-    TARGET_HEADERS_SET,
-    TARGET_MIME_TYPES_SET,
-    decodeBase64String
-  } = contextObject;
+const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
+  // const {
+  //   TARGET_HEADERS_SET,
+  //   TARGET_MIME_TYPES_SET,
+  //   decodeBase64String
+  // } = contextObject;
   const {
     payload: {
       headers,
-      body,
+      // body,
       parts = []
     }
   } = response;
 
-  const relevantHeaders = headers.reduce((headerMap, headerObject, index) => {
+  const relevantHeaders = headers.reduce((headerMap, headerObject /* , index */) => {
     const { name, value } = headerObject;
-    
-    // TODO - write a helper function extractTimeFromReceivedheader to create a new key, 'timeReceived'
+
+    // TODO write a helper extractTimeFromReceivedheader to create a new key, 'timeReceived'
     // `string.slice(indexof(';'), string.length).trim()` might work!
 
     if (TARGET_HEADERS_SET.has(name)) {
       // if (name === RECEIVED) {
-      //   headerMap[`${name}_${index}`] = value;    
+      //   headerMap[`${name}_${index}`] = value;
       // } else {
       //   headerMap[name] = value;
       // }
@@ -71,10 +68,12 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
         // const size = value.length;
         // const date = value.slice(semiColonIndex + 1, size).trim();
 
-        dateString = extractDateStringFromReceivedHeader(value);
+        const dateString = extractDateStringFromReceivedHeader(value);
+        // eslint-disable-next-line no-param-reassign
         headerMap.date = dateString;
       }
 
+      // eslint-disable-next-line no-param-reassign
       headerMap[name] = value;
       return headerMap;
     }
@@ -82,7 +81,7 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
     return headerMap;
   }, {});
 
-  const relevantBodyParts = parts.reduce((list, bodyObject, index) => {
+  const relevantBodyParts = parts.reduce((list, bodyObject /* , index */) => {
     const { body, mimeType } = bodyObject;
 
     if (!body || !body.data) {
@@ -100,24 +99,24 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
   return {
     headers: relevantHeaders,
     body: relevantBodyParts.join('')
-  }
+  };
 };
 
-const buildEmailReducer = context => (accumulationObject, emailObject) => {
-  const {
-    test
-  } = context;
-  const {
-    testy
-  } = accumulationObject;
-  const {
-    headers: {
-      date,
-      From: sentBy,
-      To: to,
-    },
-    body: emailBody
-  } = emailObject;
+const buildEmailReducer = (/* context */) => (accumulationObject /* , emailObject */) => {
+  // const {
+  //   test
+  // } = context;
+  // const {
+  //   testy
+  // } = accumulationObject;
+  // const {
+  //   headers: {
+  //     date,
+  //     From: sentBy,
+  //     To: to,
+  //   },
+  //   body: emailBody
+  // } = emailObject;
 
   return {
     ...accumulationObject
@@ -125,7 +124,6 @@ const buildEmailReducer = context => (accumulationObject, emailObject) => {
 };
 
 const scanEmails = async (pgFunctions, redisFunctions, userId) => {
-
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
   const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
 
@@ -134,12 +132,12 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     process.exit(1);
   }
 
-  if (!token || !token['refresh_token']) {
+  if (!token || !token.refresh_token) {
     console.error('no refresh token data found in db');
     process.exit(1);
   }
 
-  const accessToken = token['access_token'];
+  const accessToken = token.access_token;
 
   const tokenIsExpired = await isTokenExpiredByAPICheck(accessToken);
   let refreshedToken;
@@ -153,7 +151,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     refreshedToken = token;
   }
 
-  const { response, statusCode, error } = await listGmailMessages(refreshedToken);
+  const { response, error } = await listGmailMessages(refreshedToken);
 
   const { messages } = response;
 
@@ -163,7 +161,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   const messagePromises = messages.map(({ id }) => getGmailMessageById(refreshedToken, id));
-  
+
   let messageObjects;
   try {
     console.log('waiting for all getGmailMessageById api calls to finish...');
@@ -201,15 +199,15 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   };
 
   const emailReducer = buildEmailReducer(context);
-  
-  const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
-  const {
-    messagesOnEdgeDate = [],
-    newEntities = [],
-    newContacts = [],
-    existingContacts = {}
-  } = accumulator;
+  /* const dbOperationsObject = */ formattedEmailObjects.reduce(emailReducer, accumulator);
+
+  // const {
+  //   messagesOnEdgeDate = [],
+  //   newEntities = [],
+  //   newContacts = [],
+  //   existingContacts = {}
+  // } = accumulator;
 
   process.exit(0);
 };
