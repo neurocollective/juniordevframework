@@ -1,20 +1,22 @@
 <template>
-  <main>
-    <h1>Login</h1>
-    <div class="login-container">
-      <div>
-        <label>Enter your registered gmail account:</label>
-        <input type="text" v-model="email" />
-        <button @click="onSubmit">Login</button>
+  <main class="md-layout md-alignment-center">
+    <div class="md-layout-item md-large-size-33 md-small-size-100">
+      <h1>Please Login</h1>
+      <md-field>
+        <label>Enter your registered GMail address</label>
+        <md-input v-model="email" type="text"></md-input>
+      </md-field>
+      <div class="md-layout md-alignment-center-center">
+        <md-button @click="onSubmit" class="md-layout-item md-raised md-primary">Login</md-button>
+        <div class="md-layout-item ">
+          <span>No account?</span>
+          &nbsp;
+          <a @click="goToSignup" href="javascript:void(0);">Sign Up</a>
+        </div>
       </div>
     </div>
     <div v-if="this.loginError" class="login-error">
       {{ this.loginError }}
-    </div>
-    <div>
-       <span>No account?</span>
-       &nbsp;
-       <a @click="goToSignup" href="javascript:void(0);">Sign Up</a>
     </div>
   </main>
 </template>
@@ -92,10 +94,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .login-container {
-
-  }
   .login-error {
     color: red;
+  }
+  .no-account {
+    /* padding-left: 10px;
+    vertical-align: middle;
+    padding-top: 10px; */
   }
 </style>

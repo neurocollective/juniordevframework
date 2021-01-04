@@ -26,7 +26,7 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 
     console.log('sent:', email, firstName, lastName);
     if (!email) {
-      return res.status(500).json({ error: 'email required' });
+      return res.status(500).json({ error: 'Email Required' });
     }
 
     await dbFunctions.beginTransaction();

@@ -31,12 +31,12 @@ lint:
 	npm run lint --prefix ./server
 	npm run lint --prefix ./ui
 	npm run lint --prefix ./job_runner
-	npm run lint --prefix ./lib # only installs jest TODO - can we remove dependencies and package.json from /lib?
+	npm run lint --prefix ./lib
 install:
 	npm i --prefix ./server
 	npm i --prefix ./ui
 	npm i --prefix ./job_runner
-	npm i --prefix ./lib # only installs jest TODO - can we remove dependencies and package.json from /lib?
+	npm i --prefix ./lib
 images:
 	docker build -t junior_dev_framework_server:latest ./server
 backend:
