@@ -2,9 +2,10 @@
   <main class="md-layout md-alignment-center">
     <div class="md-layout-item md-large-size-33 md-small-size-100">
       <h1>Please Login</h1>
-      <md-field>
+      <md-field :class="this.loginError? 'md-invalid' : ''">
         <label>Enter your registered GMail address</label>
         <md-input v-model="email" type="text"></md-input>
+        <span class="md-error">{{ this.loginError }}</span>
       </md-field>
       <div class="md-layout md-alignment-center-center">
         <md-button @click="onSubmit" class="md-layout-item md-raised md-primary">Login</md-button>
@@ -14,9 +15,6 @@
           <a @click="goToSignup" href="javascript:void(0);">Sign Up</a>
         </div>
       </div>
-    </div>
-    <div v-if="this.loginError" class="login-error">
-      {{ this.loginError }}
     </div>
   </main>
 </template>
@@ -96,10 +94,5 @@ export default {
 <style scoped>
   .login-error {
     color: red;
-  }
-  .no-account {
-    /* padding-left: 10px;
-    vertical-align: middle;
-    padding-top: 10px; */
   }
 </style>
