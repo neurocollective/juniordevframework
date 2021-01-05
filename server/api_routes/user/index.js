@@ -56,7 +56,7 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
     await createSessionCookie(res, redisFunctions, userId);
 
     const contextObject = { credentialsObject, userId, email };
-      return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
+    return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
   });
 
   return userRouter;

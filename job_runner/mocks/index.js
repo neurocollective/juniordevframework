@@ -376,5 +376,5 @@ const RAW_LISTINGS = [
 ];
 
 module.exports = {
-    RAW_LISTINGS
+  RAW_LISTINGS
 };
