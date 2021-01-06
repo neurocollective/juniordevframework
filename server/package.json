@@ -6,7 +6,10 @@
   "scripts": {
     "test": "jest ./api_routes",
     "lint": "eslint \"./**/*.js\"",
-    "lint:fix": "eslint \"./**/*.js\" --fix"
+    "lint:fix": "eslint \"./**/*.js\" --fix",
+    "start": "node server.js",
+    "start:dev": "nodemon server.js",
+    "start:mock": "MOCK=1 nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +21,7 @@
     "eslint": "^7.16.0",
     "express": "^4.17.1",
     "moment": "^2.29.1",
+    "nodemon": "^2.0.6",
     "pg": "^8.3.3",
     "redis": "^3.0.2"
   },

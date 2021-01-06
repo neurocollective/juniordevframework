@@ -25,8 +25,9 @@ import { UI_CONSTANTS } from '../../../lib/constants';
 
 const {
   ACTION_TYPES: {
-    LOGIN_ERROR
-  }
+    LOGIN_ERROR,
+    GO_HOME
+  },
 } = UI_CONSTANTS;
 
 export default {
@@ -68,7 +69,7 @@ export default {
         }
 
         if (json.authorized) {
-          this.$store.dispatch('goToHome');
+          this.$store.dispatch(GO_HOME);
         }
       };
 

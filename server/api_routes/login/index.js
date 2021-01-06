@@ -16,6 +16,11 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
   const loginRouter = Router();
 
   loginRouter.post('/', async (req, res) => {
+    if (process.env.MOCK === '1') {
+      console.log('Login mocked because MOCK=1');
+      return res.status(200).json({ authorized: true });
+    }
+
     const {
       body: {
         email

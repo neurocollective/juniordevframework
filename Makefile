@@ -23,8 +23,11 @@ test:
 	# npm t --prefix ./server
 	# npm run test:unit  --prefix ./ui
 serve:
-	# LOCAL_MODE=true npx nodemon -x "node -e \"const bootServer = require('./server'); bootServer();\""
-	SCHEMA_VERSION=v2 LOCAL_MODE=true node -e "const bootServer = require('./server'); bootServer();"
+	SCHEMA_VERSION=v2 LOCAL_MODE=true npm run start --prefix ./server
+serve/dev:
+	SCHEMA_VERSION=v2 LOCAL_MODE=true npm run start:dev --prefix ./server
+serve/mock:
+	SCHEMA_VERSION=v2 LOCAL_MODE=true npm run start:mock --prefix ./server
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 lint:

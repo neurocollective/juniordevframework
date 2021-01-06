@@ -117,6 +117,16 @@ Runs `psql` (the postgres REPL) inside the postgres container so you can write s
 
 Runs `npm test` in all packages.
 
+#### `make lint`
+
+Runs `npm run lint` in all packages. Also runs as part of the pre-push hook via husky
+
+#### `make serve[/dev, /mock]`
+
+Starts the server. 
+* `serve/dev` nodemon is used to autorestart the server on code changes.
+* `serve/mock` nodemon + authentication is disabled.
+
 ## FAQ
 
 - Give access to read my email, are you crazy??

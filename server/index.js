@@ -15,7 +15,7 @@ const {
   bootstrapRedisFunctions
 } = require('../lib/redis');
 
-const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
+const CONFIG = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
 
 const {
   dbConnection: connectionString = '',
