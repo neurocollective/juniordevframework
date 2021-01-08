@@ -1,9 +1,10 @@
-const {
+import {
   findUserListingsToAdd
-} = require('.');
-const {
+} from '.';
+
+import {
   RAW_LISTINGS
-} = require('../../mocks');
+} from '../../mocks';
 
 describe('job_runner/jobs', () => {
   describe('findUserListingsToAdd', () => {

@@ -1,6 +1,6 @@
-const {
+import {
   buildInsertQueryFromListings,
-} = require('../../../lib/postgres');
+} from '../../../lib/postgres';
 
 // eslint-disable-next-line max-len
 const buildExistingListingsForUserMap = (userListingObjects) => userListingObjects.reduce((map, userListingObject) => {
@@ -114,7 +114,7 @@ const createUserListings = (pgFunctions) => {
   return syncListingsToUsers(pgFunctions);
 };
 
-module.exports = {
+export {
   syncListingsToUsers,
   findUserListingsToAdd,
   buildExistingListingsForUserMap,

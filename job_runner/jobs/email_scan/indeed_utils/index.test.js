@@ -1,7 +1,7 @@
-const fs = require('fs');
+import fs from 'fs';
+import { scanIndeedEmail } from '.';
 
 const { cwd } = process;
-const { scanIndeedEmail } = require('.');
 
 const samplePath = `${cwd()}/job_runner/jobs/email_scan/indeed_utils/sample_indeed_email.html`;
 const SAMPLE_HTML = fs.readFileSync(samplePath);

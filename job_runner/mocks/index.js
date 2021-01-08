@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 const RAW_LISTINGS = [
   {
     id: 1,
@@ -375,6 +376,6 @@ const RAW_LISTINGS = [
   }
 ];
 
-module.exports = {
+export {
   RAW_LISTINGS
 };

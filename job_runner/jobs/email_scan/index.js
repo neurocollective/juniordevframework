@@ -1,11 +1,12 @@
-const {
+/* eslint-disable import/prefer-default-export */
+import {
   refreshToken,
   isTokenExpiredByAPICheck,
   listGmailMessages,
   getGmailMessageById,
   decodeBase64String,
   CONSTANTS
-} = require('../../../lib');
+} from '../../../lib';
 
 const {
   EMAIL_SCAN: {
@@ -212,6 +213,6 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   process.exit(0);
 };
 
-module.exports = {
+export {
   scanEmails
 };
