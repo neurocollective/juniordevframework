@@ -1,3 +1,3 @@
-const bootServer = require('./index');
+import bootServer from './index';
 
 bootServer();

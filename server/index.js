@@ -1,19 +1,20 @@
-const express = require('express');
+import express from 'express';
+import cors from 'cors';
+import redis from 'redis';
+import fs from 'fs';
+import cookieParser from 'cookie-parser';
+import { Client } from 'pg';
+import http from 'http';
+import https from 'https';
+import getAPIRoutes from './api_routes';
+import {
+  bootstrapPostgresFunctions
+} from '../lib/postgres';
+import {
+  bootstrapRedisFunctions
+} from '../lib/redis';
 
 const app = express();
-const cors = require('cors');
-const { Client } = require('pg');
-const redis = require('redis');
-const fs = require('fs');
-const cookieParser = require('cookie-parser');
-// const { v4: uuid } = require('uuid');
-const getAPIRoutes = require('./api_routes');
-const {
-  bootstrapPostgresFunctions
-} = require('../lib/postgres');
-const {
-  bootstrapRedisFunctions
-} = require('../lib/redis');
 
 const CONFIG = JSON.parse(fs.readFileSync(`${__dirname}/config.json`));
 
@@ -112,18 +113,14 @@ const bootServer = async () => {
   app.use('/api', getAPIRoutes(postgresFunctions, redisFunctions, credentials));
 
   if (useTLS) {
-    // eslint-disable-next-line global-require
-    const https = require('https');
     https.createServer(optionsForTLS, app).listen(HTTPS_PORT, () => {
       console.log(`Express HTTPS server listening on port ${HTTPS_PORT}`);
     });
   } else {
-    // eslint-disable-next-line global-require
-    const http = require('http');
     http.createServer(app).listen(PORT, () => {
       console.log(`Express HTTP server listening on port ${PORT}`);
     });
   }
 };
 
-module.exports = bootServer;
+export default bootServer;

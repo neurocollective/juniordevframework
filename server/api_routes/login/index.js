@@ -1,14 +1,14 @@
-const { Router } = require('express');
+import { Router } from 'express';
+import {
+  isTokenExpiredByAPICheck,
+  getAuthURLAndSendRedirectJSON
+} from '../../../lib';
 
 const {
   env: {
     REDIRECT_AUTH_URLS: redirectEnvValue = ''
   }
 } = process;
-const {
-  isTokenExpiredByAPICheck,
-  getAuthURLAndSendRedirectJSON
-} = require('../../../lib');
 
 const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() === 'true';
 
@@ -78,4 +78,4 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
   return loginRouter;
 };
 
-module.exports = getLoginPageRouter;
+export default getLoginPageRouter;

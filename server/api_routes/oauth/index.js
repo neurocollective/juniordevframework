@@ -1,10 +1,10 @@
-const { Router } = require('express');
+import { Router } from 'express';
 // const { v4: uuid } = require('uuid');
-const {
+import {
   getGmailProfile,
   requestToken,
   createSessionCookie
-} = require('../../../lib');
+} from '../../../lib';
 
 // const  {
 //   env: {
@@ -122,4 +122,4 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
   return oAuthRouter;
 };
 
-module.exports = getOAuthRoutes;
+export default getOAuthRoutes;

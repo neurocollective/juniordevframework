@@ -1,20 +1,20 @@
-const { Router } = require('express');
+import { Router } from 'express';
+
+import getLoginRoutes from './login';
+import getPageLoadRoutes from './pageload';
+import getOAuthRoutes from './oauth';
+import getUserRoutes from './user';
+
+import { ROUTING } from '../../lib/constants';
+
+import buildAuthMiddleware from '../middleware';
+
 const {
-  ROUTING: {
-    SLASH_LOGIN,
-    SLASH_OAUTH,
-    SLASH_PAGELOAD,
-    SLASH_USER
-  }
-} = require('../../lib/constants');
-
-// const loginRoutes = require('./login');
-// const pageLoadRoutes = require('./pageload');
-
-const getLoginRoutes = require('./login');
-const getPageLoadRoutes = require('./pageload');
-const getOAuthRoutes = require('./oauth');
-const getUserRoutes = require('./user');
+  SLASH_LOGIN,
+  SLASH_OAUTH,
+  SLASH_PAGELOAD,
+  SLASH_USER
+} = ROUTING;
 
 const {
   env: {
@@ -26,8 +26,6 @@ let local = false;
 if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
   local = true;
 }
-
-const { buildAuthMiddleware } = require('../middleware');
 
 const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
   const apiRouter = Router();
@@ -118,4 +116,4 @@ const getAPIRouter = (postgresFunctions, redisFunctions, credentialsObject) => {
   return apiRouter;
 };
 
-module.exports = getAPIRouter;
+export default getAPIRouter;

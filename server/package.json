@@ -2,14 +2,14 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest ./api_routes",
     "lint": "eslint \"./**/*.js\"",
     "lint:fix": "eslint \"./**/*.js\" --fix",
-    "start": "node server.js",
-    "start:dev": "nodemon server.js",
-    "start:mock": "MOCK=1 nodemon server.js"
+    "start": "babel-node server.js",
+    "start:dev": "nodemon --exec babel-node server.js",
+    "start:mock": "MOCK=1 nodemon --exec babel-node server.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +26,10 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "jest": "^26.4.2"
