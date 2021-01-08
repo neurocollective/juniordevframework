@@ -3,7 +3,7 @@ import {
   getAuthUrlFromCredentials
 } from '../../lib';
 
-import { MIDDLEWARE, COOKIES, ROUTING } from '../../lib/constants';
+import CONSTANTS from '../../lib/constants';
 
 const {
   env: {
@@ -15,15 +15,15 @@ const {
   VALID_TOKEN,
   USER_ID,
   REDIRECT_URL
-} = MIDDLEWARE;
+} = CONSTANTS.MIDDLEWARE;
 const {
 
   KEY: SESSION_KEY
-} = COOKIES;
+} = CONSTANTS.COOKIES;
 
 const {
   SLASH_LOGIN
-} = ROUTING;
+} = CONSTANTS.ROUTING;
 
 let local = false;
 if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {

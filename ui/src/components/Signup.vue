@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { UI_CONSTANTS } from '../../../lib/constants';
+import UI_CONSTANTS from '../../../lib/constants';
 import { buildFetchJsonOrRedirect } from '../utils';
 
 const {

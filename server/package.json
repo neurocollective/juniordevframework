@@ -8,7 +8,7 @@
     "lint": "eslint \"./**/*.js\"",
     "lint:fix": "eslint \"./**/*.js\" --fix",
     "start": "babel-node server.js",
-    "start:dev": "nodemon --exec babel-node server.js",
+    "start:dev": "nodemon --exec babel-node --root-mode upward --only .,../lib/ server.js",
     "start:mock": "MOCK=1 nodemon --exec babel-node server.js"
   },
   "keywords": [],
@@ -23,7 +23,9 @@
     "moment": "^2.29.1",
     "nodemon": "^2.0.6",
     "pg": "^8.3.3",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "request-promise-native": "^1.0.9",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.10",

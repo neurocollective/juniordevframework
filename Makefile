@@ -36,6 +36,7 @@ lint:
 	npm run lint --prefix ./job_runner
 	npm run lint --prefix ./lib
 install:
+	npm i
 	npm i --prefix ./server
 	npm i --prefix ./ui
 	npm i --prefix ./job_runner

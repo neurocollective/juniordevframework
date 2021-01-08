@@ -5,7 +5,7 @@ import getPageLoadRoutes from './pageload';
 import getOAuthRoutes from './oauth';
 import getUserRoutes from './user';
 
-import { ROUTING } from '../../lib/constants';
+import CONSTANTS from '../../lib/constants';
 
 import buildAuthMiddleware from '../middleware';
 
@@ -14,7 +14,7 @@ const {
   SLASH_OAUTH,
   SLASH_PAGELOAD,
   SLASH_USER
-} = ROUTING;
+} = CONSTANTS.ROUTING;
 
 const {
   env: {
