@@ -7,9 +7,9 @@
     "test": "jest ./api_routes",
     "lint": "eslint \"./**/*.js\"",
     "lint:fix": "eslint \"./**/*.js\" --fix",
-    "start": "babel-node server.js",
+    "start": "babel-node --root-mode upward --only .,../lib/ server.js",
     "start:dev": "nodemon --exec babel-node --root-mode upward --only .,../lib/ server.js",
-    "start:mock": "MOCK=1 nodemon --exec babel-node server.js"
+    "start:mock": "MOCK=1 nodemon --exec babel-node --root-mode upward --only .,../lib/ server.js"
   },
   "keywords": [],
   "author": "",
