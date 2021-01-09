@@ -52,9 +52,9 @@ list:
 psql:
 	docker exec -it junior_dev_framework_dev_postgres psql -U postgres
 user_listings:
-	node ./job_runner create_user_listings
+	USER_ID=1 npm run --prefix ./job_runner start create_user_listings
 scan:
-	USER_ID=1 node ./job_runner scan_emails
+	USER_ID=1 npm run --prefix ./job_runner start scan_emails
 oaserve:
 	npx nodemon -x 'node -e "const { bootServer } = require(\"./oauth_server\"); bootServer();"'
 build/prod:

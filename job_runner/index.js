@@ -32,7 +32,7 @@ const main = async () => {
     console.error('userId must be passed as an environment variable');
     process.exit(1);
   }
-  const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
+  const CONFIG = JSON.parse(fs.readFileSync(`${__dirname}/../server/config.json`));
   const {
     dbConnection: connectionString = '',
     // tlsKeyPath,

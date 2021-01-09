@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "node -e \"const bootServer = require('./jobs/email_scan/server.js'); bootServer();\"",
+    "start": "babel-node --root-mode upward --only .,../lib/ index.js",
     "test": "jest ./jobs",
     "lint": "eslint \"./**/*.js\"",
     "lint:fix": "eslint \"./**/*.js\" --fix"
@@ -23,6 +23,9 @@
     "uuid": "^8.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
     "eslint": "^7.16.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
