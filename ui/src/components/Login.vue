@@ -21,14 +21,16 @@
 
 <script>
 import { buildFetchJsonOrRedirect } from '../utils';
-import UI_CONSTANTS from '../../../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 
 const {
-  ACTION_TYPES: {
-    LOGIN_ERROR,
-    GO_HOME
-  },
-} = UI_CONSTANTS;
+  UI_CONSTANTS: {
+    ACTION_TYPES: {
+      LOGIN_ERROR,
+      GO_HOME
+    },
+  }
+} = CONSTANTS;
 
 export default {
   name: 'Login',

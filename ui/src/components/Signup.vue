@@ -25,14 +25,16 @@
 </template>
 
 <script>
-import UI_CONSTANTS from '../../../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 import { buildFetchJsonOrRedirect } from '../utils';
 
 const {
-  ACTION_TYPES: {
-    GO_TO_LOGIN
+  UI_CONSTANTS: {
+    ACTION_TYPES: {
+      GO_TO_LOGIN
+    }
   }
-} = UI_CONSTANTS;
+} = CONSTANTS;
 
 export default {
   name: 'Signup',

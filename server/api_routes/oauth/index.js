@@ -36,9 +36,6 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
       console.error('error running requestToken at /oauth:', err);
     }
 
-    console.log('statusCode from requestToken response:', statusCode);
-    console.log('token.refresh_token', token.refresh_token);
-
     if (error || !token || !token.access_token) {
       const errorMessage = `token not retrieved! statusCode from google: ${statusCode}, error: ${error}`;
       console.error('line 57 error:', errorMessage);
@@ -55,7 +52,7 @@ const getOAuthRoutes = (dbFunctions, redisFunctions, credentialsObject) => {
     if (getProfileError || Number(gmailStatusCode) > 399) {
       // still store token as orphaned? orphaned_oauth_token create-query exists
       const errorMessage = `/oauth got this error trying to use a newly issued token: ${getProfileError}`;
-      // console.error('getProfileError', getProfileError);
+      console.error('getProfileError', getProfileError);
       console.error('gmailStatusCode', gmailStatusCode);
       return res.redirect(`http://localhost:8080/?error=${encodeURIComponent(errorMessage)}`);
     }

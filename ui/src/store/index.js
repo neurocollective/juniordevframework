@@ -1,33 +1,35 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import UI_CONSTANTS from '../../../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 
 const {
-  PAGES: {
-    ACCOUNT,
-    RESULTS,
-    TODOS,
-    CONTACTS,
-    HOME,
-    LOGIN,
-    SIGNUP
-  },
-  ACTION_TYPES: {
-    LOAD_PAGE_DATA_SUCCESS,
-    LOAD_PAGE_DATA_ERROR,
-    CHANGE_ROUTE,
-    TOGGLE_MENU,
-    GO_TO_CONTACTS,
-    GO_TO_TODOS,
-    GO_TO_RESULTS,
-    GO_TO_ACCOUNT,
-    GO_TO_LOGIN,
-    GO_TO_SIGNUP,
-    INCREMENT_PAGE_COUNT,
-    GO_HOME,
-    LOGIN_ERROR
+  UI_CONSTANTS: {
+    PAGES: {
+      ACCOUNT,
+      RESULTS,
+      TODOS,
+      CONTACTS,
+      HOME,
+      LOGIN,
+      SIGNUP
+    },
+    ACTION_TYPES: {
+      LOAD_PAGE_DATA_SUCCESS,
+      LOAD_PAGE_DATA_ERROR,
+      CHANGE_ROUTE,
+      TOGGLE_MENU,
+      GO_TO_CONTACTS,
+      GO_TO_TODOS,
+      GO_TO_RESULTS,
+      GO_TO_ACCOUNT,
+      GO_TO_LOGIN,
+      GO_TO_SIGNUP,
+      INCREMENT_PAGE_COUNT,
+      GO_HOME,
+      LOGIN_ERROR
+    }
   }
-} = UI_CONSTANTS;
+} = CONSTANTS;
 
 Vue.use(Vuex);
 
