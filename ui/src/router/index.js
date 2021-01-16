@@ -6,19 +6,21 @@ import Results from '../components/Results.vue';
 import Todos from '../components/Todos.vue';
 import Login from '../components/Login.vue';
 import Signup from '../components/Signup.vue';
-import { UI_CONSTANTS } from '../../../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 
 const {
-  PAGES: {
-    ACCOUNT,
-    RESULTS,
-    TODOS,
-    CONTACTS,
-    HOME,
-    LOGIN,
-    SIGNUP
+  UI_CONSTANTS: {
+    PAGES: {
+      ACCOUNT,
+      RESULTS,
+      TODOS,
+      CONTACTS,
+      HOME,
+      LOGIN,
+      SIGNUP
+    }
   }
-} = UI_CONSTANTS;
+} = CONSTANTS;
 
 const router = {
   [ACCOUNT]: Account,

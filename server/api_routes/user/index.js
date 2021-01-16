@@ -1,9 +1,11 @@
-const { Router } = require('express');
-const moment = require('moment');
-const {
+import { Router } from 'express';
+import moment from 'moment';
+
+import {
   createSessionCookie,
   getAuthURLAndSendRedirectJSON
-} = require('../../../lib');
+} from '../../../lib';
+
 // const  {
 //   env: {
 //     REDIRECT_AUTH_URLS: redirectEnvValue = ''
@@ -56,10 +58,10 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
     await createSessionCookie(res, redisFunctions, userId);
 
     const contextObject = { credentialsObject, userId, email };
-      return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
+    return getAuthURLAndSendRedirectJSON(res, contextObject, 200);
   });
 
   return userRouter;
 };
 
-module.exports = getUserRouter;
+export default getUserRouter;

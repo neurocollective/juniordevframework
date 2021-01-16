@@ -1,4 +1,4 @@
-const { Router } = require('express');
+import { Router } from 'express';
 
 // const pageLoadRouter = Router();
 
@@ -28,5 +28,4 @@ const getPageLoadRouter = () => {
   return pageLoadRouter;
 };
 
-// module.exports = pageLoadRouter;
-module.exports = getPageLoadRouter;
+export default getPageLoadRouter;

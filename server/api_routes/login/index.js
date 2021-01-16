@@ -1,14 +1,14 @@
-const { Router } = require('express');
+import { Router } from 'express';
+import {
+  isTokenExpiredByAPICheck,
+  getAuthURLAndSendRedirectJSON
+} from '../../../lib';
 
 const {
   env: {
     REDIRECT_AUTH_URLS: redirectEnvValue = ''
   }
 } = process;
-const {
-  isTokenExpiredByAPICheck,
-  getAuthURLAndSendRedirectJSON
-} = require('../../../lib');
 
 const REDIRECT_AUTH_URLS = redirectEnvValue.toLowerCase() === 'true';
 
@@ -16,6 +16,11 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
   const loginRouter = Router();
 
   loginRouter.post('/', async (req, res) => {
+    if (process.env.MOCK === '1') {
+      console.log('Login mocked because MOCK=1');
+      return res.status(200).json({ authorized: true });
+    }
+
     const {
       body: {
         email
@@ -73,4 +78,4 @@ const getLoginPageRouter = (dbFunctions, redisFunctions, credentialsObject) => {
   return loginRouter;
 };
 
-module.exports = getLoginPageRouter;
+export default getLoginPageRouter;

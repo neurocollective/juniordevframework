@@ -1,25 +1,29 @@
+import {
+  isTokenExpiredByAPICheck,
+  getAuthUrlFromCredentials
+} from '../../lib';
+
+import CONSTANTS from '../../lib/constants';
+
 const {
   env: {
     LOCAL_MODE
   }
 } = process;
+
 const {
-  MIDDLEWARE: {
-    VALID_TOKEN,
-    USER_ID,
-    REDIRECT_URL
-  },
-  COOKIES: {
-    KEY: SESSION_KEY
-  },
-  ROUTING: {
-    SLASH_LOGIN
-  }
-} = require('../../lib/constants');
+  VALID_TOKEN,
+  USER_ID,
+  REDIRECT_URL
+} = CONSTANTS.MIDDLEWARE;
 const {
-  isTokenExpiredByAPICheck,
-  getAuthUrlFromCredentials
-} = require('../../lib');
+
+  KEY: SESSION_KEY
+} = CONSTANTS.COOKIES;
+
+const {
+  SLASH_LOGIN
+} = CONSTANTS.ROUTING;
 
 let local = false;
 if (LOCAL_MODE && LOCAL_MODE.toLowerCase() === 'true') {
@@ -103,6 +107,4 @@ const buildAuthMiddleware = (postgresFunctions, redisFunctions, credentialsObjec
   ];
 };
 
-module.exports = {
-  buildAuthMiddleware
-};
+export default buildAuthMiddleware;

@@ -1,24 +1,24 @@
-const {
+import {
   buildInsertQueryFromListings,
-} = require('../../../lib/postgres');
+} from '../../../lib/postgres';
 
 // eslint-disable-next-line max-len
 const buildExistingListingsForUserMap = (userListingObjects) => userListingObjects.reduce((map, userListingObject) => {
-    // console.log('userListingObject:', userListingObject);
-    const {
-      userId,
-      rows: userListings
-    } = userListingObject;
+  // console.log('userListingObject:', userListingObject);
+  const {
+    userId,
+    rows: userListings
+  } = userListingObject;
     // console.log('userListings:', userListings);
 
-    const listingIdSet = userListings.reduce((set, userListing) => {
-      const { job_listing_id: listingId } = userListing;
-      set.add(listingId);
-      return set;
-    }, new Set());
+  const listingIdSet = userListings.reduce((set, userListing) => {
+    const { job_listing_id: listingId } = userListing;
+    set.add(listingId);
+    return set;
+  }, new Set());
 
-    map.set(userId, listingIdSet);
-    return map;
+  map.set(userId, listingIdSet);
+  return map;
 
   //   let listingIdSet;
   //   if (userListingMap.has(userId)) {
@@ -114,7 +114,7 @@ const createUserListings = (pgFunctions) => {
   return syncListingsToUsers(pgFunctions);
 };
 
-module.exports = {
+export {
   syncListingsToUsers,
   findUserListingsToAdd,
   buildExistingListingsForUserMap,

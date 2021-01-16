@@ -8,16 +8,15 @@
         </div>
         <md-field>
           <label>GMail address you want to use</label>
-          <md-input type="text" v-bind:value="this.email" v-on:input="this.handleEmailInput" />
+          <md-input type="text" v-model="user.email" />
         </md-field>
         <md-field>
           <label>First Name</label>
-          <md-input type="text" v-bind:value="this.firstName"
-            v-on:input="this.handleFirstNameInput" />
+          <md-input type="text" v-model="user.firstName" />
         </md-field>
         <md-field>
           <label>Last Name</label>
-          <md-input type="text" v-bind:value="lastName" v-on:input="this.handleLastNameInput" />
+          <md-input type="text" v-model="user.lastName" />
         </md-field>
         <md-button @click="handleSignup" class="md-raised md-primary">Signup</md-button>
       </div>
@@ -26,14 +25,16 @@
 </template>
 
 <script>
-import { UI_CONSTANTS } from '../../../lib/constants';
+import CONSTANTS from '../../../lib/constants';
 import { buildFetchJsonOrRedirect } from '../utils';
 
 const {
-  ACTION_TYPES: {
-    GO_TO_LOGIN
+  UI_CONSTANTS: {
+    ACTION_TYPES: {
+      GO_TO_LOGIN
+    }
   }
-} = UI_CONSTANTS;
+} = CONSTANTS;
 
 export default {
   name: 'Signup',
@@ -44,37 +45,11 @@ export default {
   },
   data: function() {
     return {
-      error: null, email: '', lastName: '', firstName: ''
+      error: null,
+      user: { email: '', lastName: '', firstName: '' }
     };
   },
   methods: {
-    handleEmailInput(e) {
-      const {
-        target: {
-          value
-        }
-      } = e;
-      console.log('value', value);
-      this.email = value;
-    },
-    handleFirstNameInput(e) {
-      const {
-        target: {
-          value
-        }
-      } = e;
-      console.log('value', value);
-      this.firstName = value;
-    },
-    handleLastNameInput(e) {
-      const {
-        target: {
-          value
-        }
-      } = e;
-      console.log('value', value);
-      this.lastName = value;
-    },
     handleSignup() {
       const onJson = (statusCode, ok, json) => {
         console.log('Login\'s onJson');
@@ -94,9 +69,9 @@ export default {
         url: 'http://localhost:3000/api/user/new',
         method: 'POST',
         body: JSON.stringify({
-          email: this.email,
-          firstName: this.firstName,
-          lastName: this.lastName
+          email: this.user.email,
+          firstName: this.user.firstName,
+          lastName: this.user.lastName
         }),
         headers: {
           'Content-Type': 'application/json',

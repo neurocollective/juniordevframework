@@ -1,23 +1,25 @@
-const fs = require('fs');
-const { Client } = require('pg');
-const redis = require('redis');
+import fs from 'fs';
+import { Client } from 'pg';
+import redis from 'redis';
 
-const {
+import {
   createUserListings
-} = require('./jobs/create_user_listings');
-const {
+} from './jobs/create_user_listings';
+import {
   scanEmails
-} = require('./jobs/email_scan');
+} from './jobs/email_scan';
+import CONSTANTS from '../lib/constants';
+import {
+  bootstrapPostgresFunctions
+} from '../lib/postgres';
+import {
+  bootstrapRedisFunctions
+} from '../lib/redis';
+
 const {
   JOB_COMMAND_CREATE_USER_LISTINGS,
   JOB_COMMAND_SCAN_EMAILS
-} = require('../lib/constants');
-const {
-  bootstrapPostgresFunctions
-} = require('../lib/postgres');
-const {
-  bootstrapRedisFunctions
-} = require('../lib/redis');
+} = CONSTANTS;
 
 const {
   env: {
@@ -30,7 +32,7 @@ const main = async () => {
     console.error('userId must be passed as an environment variable');
     process.exit(1);
   }
-  const CONFIG = JSON.parse(fs.readFileSync(`${process.cwd()}/server/config.json`));
+  const CONFIG = JSON.parse(fs.readFileSync(`${__dirname}/../server/config.json`));
   const {
     dbConnection: connectionString = '',
     // tlsKeyPath,
