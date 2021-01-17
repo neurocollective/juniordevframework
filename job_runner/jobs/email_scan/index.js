@@ -37,12 +37,12 @@ const extractDateStringFromReceivedHeader = (str) => {
   return sliced.trim();
 };
 
-const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
-  // const {
-  //   TARGET_HEADERS_SET,
-  //   TARGET_MIME_TYPES_SET,
-  //   decodeBase64String
-  // } = contextObject;
+const buildEmailFormatMapper = contextObject => ({ response }) => {
+  const {
+    TARGET_HEADERS_SET,
+    TARGET_MIME_TYPES_SET,
+    decodeBase64String
+  } = contextObject;
   const {
     payload: {
       headers,
@@ -51,7 +51,7 @@ const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
     }
   } = response;
 
-  const relevantHeaders = headers.reduce((headerMap, headerObject /* , index */) => {
+  const relevantHeaders = headers.reduce((headerMap, headerObject) => {
     const { name, value } = headerObject;
 
     // TODO write a helper extractTimeFromReceivedheader to create a new key, 'timeReceived'
@@ -149,12 +149,18 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
     await pgFunctions.insertRefreshedToken(refreshedToken, userId);
   } else {
+    console.log('token is valid,', token);
     refreshedToken = token;
   }
 
   const { response, error } = await listGmailMessages(refreshedToken);
 
   const { messages } = response;
+
+  if (!messages) {
+    console.log('ERROR, messages is falsy. response:', response);
+    process.exit(1);
+  }
 
   if (error) {
     console.error(error);
@@ -201,14 +207,14 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const emailReducer = buildEmailReducer(context);
 
-  /* const dbOperationsObject = */ formattedEmailObjects.reduce(emailReducer, accumulator);
+  const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
-  // const {
-  //   messagesOnEdgeDate = [],
-  //   newEntities = [],
-  //   newContacts = [],
-  //   existingContacts = {}
-  // } = accumulator;
+  const {
+    messagesOnEdgeDate = [],
+    newEntities = [],
+    newContacts = [],
+    existingContacts = {}
+  } = accumulator;
 
   process.exit(0);
 };
