@@ -5,6 +5,7 @@ import {
   listGmailMessages,
   getGmailMessageById,
   decodeBase64String,
+  getFormattedIdFromName,
   CONSTANTS
 } from '../../../lib';
 
@@ -103,21 +104,29 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
   };
 };
 
-const buildEmailReducer = (/* context */) => (accumulationObject /* , emailObject */) => {
-  // const {
-  //   test
-  // } = context;
-  // const {
-  //   testy
-  // } = accumulationObject;
-  // const {
-  //   headers: {
-  //     date,
-  //     From: sentBy,
-  //     To: to,
-  //   },
-  //   body: emailBody
-  // } = emailObject;
+const buildEmailReducer = (context) => (accumulationObject, emailObject) => {
+
+  // getFormattedIdFromName is your util for getting ids from company name
+
+  const {
+    allEntities = [],
+    allContacts = [],
+    allJobListings = [],
+  } = context;
+  const {
+    messagesOnEdgeDate = [],
+    entitiesToCreate = [],
+    contactsToCreate = [],
+    jobSearchActionsToCreate = [],
+  } = accumulationObject;
+  const {
+    headers: {
+      date,
+      From: sentBy,
+      To: to,
+    },
+    body: emailBody
+  } = emailObject;
 
   return {
     ...accumulationObject
@@ -195,14 +204,16 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const accumulator = {
     messagesOnEdgeDate: [],
-    newEntities: [],
-    newContacts: [],
-    existingContacts: {}
+    entitiesToCreate: [],
+    contactsToCreate: [],
+    jobSearchActionsToCreate: [],
   };
 
   // TODO - get existing contact info for user from DB, insert into context
   const context = {
-    allEntities
+    allEntities,
+    allContacts,
+    allJobListings,
   };
 
   const emailReducer = buildEmailReducer(context);
@@ -211,9 +222,9 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const {
     messagesOnEdgeDate = [],
-    newEntities = [],
-    newContacts = [],
-    existingContacts = {}
+    entitiesToCreate = [],
+    contactsToCreate = [],
+    jobSearchActionsToCreate = [],
   } = accumulator;
 
   process.exit(0);
