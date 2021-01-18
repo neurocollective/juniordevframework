@@ -6,12 +6,17 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint \"./**/*.js\"",
-    "lint:fix": "eslint \"./**/*.js\" --fix"
+    "lint:fix": "eslint \"./**/*.js\" --fix",
+    "seed": "babel-node --root-mode upward --only .,../lib/ postgres/seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
     "eslint": "^7.16.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",

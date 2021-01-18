@@ -5,7 +5,8 @@ redis:
 postgres:
 	docker run --name junior_dev_framework_dev_postgres -p 5432:5432 -e POSTGRES_PASSWORD=test -d postgres
 seed:
-	SCHEMA_VERSION=v2 node -e "const c = require('./lib/postgres/connector.js'); c.insertAndSeed();"
+	# SCHEMA_VERSION=v2 node -e "const c = require('./lib/postgres/connector.js'); c.insertAndSeed();"
+	SCHEMA_VERSION=v2 npm run seed --prefix ./lib
 db:
 	make postgres
 	sleep 2
