@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { scanIndeedEmail } from './indeed_utils';
 import {
   refreshToken,
   isTokenExpiredByAPICheck,
@@ -15,7 +16,8 @@ const {
     TARGET_HEADERS_SET,
     HEADERS: {
       RECEIVED,
-    }
+    },
+    INDEED_APPLICATION_NOTIFY_ADDRESS,
   },
 } = CONSTANTS;
 
@@ -127,6 +129,14 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject) => {
     },
     body: emailBody
   } = emailObject;
+
+  if (sentBy === INDEED_APPLICATION_NOTIFY_ADDRESS) {
+    // it's an indeed application
+    const emailObject = scanIndeedEmail(emailBody);
+    return {
+      ...accumulationObject,
+    }
+  }
 
   return {
     ...accumulationObject
