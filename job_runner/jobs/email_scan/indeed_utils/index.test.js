@@ -1,9 +1,7 @@
 import fs from 'fs';
 import { scanIndeedEmail } from '.';
 
-const { cwd } = process;
-
-const samplePath = `${cwd()}/jobs/email_scan/indeed_utils/sample_indeed_email.html`;
+const samplePath = `${__dirname}/sample_indeed_email.html`;
 const SAMPLE_HTML = fs.readFileSync(samplePath);
 
 describe('email_scan/indeed_utils', () => {
