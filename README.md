@@ -2,11 +2,11 @@
 
 An opinionated job-search software suite for new developers. The framework is based on proven job-search / sales techniques, while tracking the results of your efforts and automating repetitive data entry tasks to help prevent your job search from overwhelming the rest of your life.
 
-# <-- WELCOME CORE CONTRIBUTORS! -->
+#  WELCOME CORE CONTRIBUTORS!
 
 This section is just for the 'alpha' build period, ending January 2021.
 
-You're joining at the time when you can make the MAXIMUM impact on this project, 
+You're joining at the time when you can make the MAXIMUM impact on this project. 
 
 Please keep in mind that this repo is a work in progress, so it needs you to invest - before any code - your interest, patience, and attention. I am just a part-time volunteer, too, and can only contribute so quickly. If this repo is overwhelming, communicate with your collaborators by opening an issue. Let's help each other!
 
@@ -14,88 +14,70 @@ The value of your contributions increases as the framework gets closer to releas
 
 If you need to know more, raise an issue!
 
-## Dependencies (for contributors running the app locally during the alpha)
+## Development Dependencies
 
-#### Software Dependencies
+### Software
 
-- `docker`
-- `docker-compose`
-- `node`
+- [Docker](https://www.docker.com/docker)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Node.js](https://nodejs.org/)
 
-#### Service Dependencies
+### Service Dependencies
 
-- a `gmail` account (other email services will be supported in the future)
-- a gmail API key on the google developer dashboard
+- a Gmail account (other email services will be supported in the future)
+- a Gmail API key from the [Google developer dashboard](http://console.developers.google.com/)
 
-## First Time Setup in 8 Steps
+## Initial Setup in 8 Steps
 
-#### Step One: Install `make` (windows && linux only, built-in on mac)
+1. Install `make` (windows && linux only, built-in on mac)
+   - windows: `choco install make`
+   - linux: `sudo apt-get install build-essential -y`
 
-windows: `choco install make`
-<br />
-linux: `sudo apt-get install build-essential -y`
+2. Install Node via `nvm` (node version manager):
+   - https://github.com/nvm-sh/nvm
 
-#### Step Two: Install Node via `nvm` (node version manager):
+3. Install `docker` and `docker-compose`:
+    - https://docs.docker.com/desktop/
+    - https://docs.docker.com/compose/install/
 
-https://github.com/nvm-sh/nvm
+4. Clone this repo:
+   - ssh (recommended): `git clone git@github.com:neurocollective/juniordevframework.git`
+   - https: `git clone https://github.com/neurocollective/juniordevframework.git`
 
-#### Step Three: Install `docker` and `docker-compose`:
-
-https://docs.docker.com/desktop/
-https://docs.docker.com/compose/install/
-
-#### Step Four: Clone this repo:
-
-ssh (recommended): `git clone git@github.com:neurocollective/juniordevframework.git`
-<br />
-https: `https://github.com/neurocollective/juniordevframework.git`
-
-#### Step Five: Get your gmail API key:
-
-- https://console.developers.google.com
-
-- Create a new Project if needed
-
-- credentials > Create Credentials > OAuth Client ID
-
-- you should now see something like this, fill it out as shown:
-
-<hr />
+5. Get your gmail API key:
+   - https://console.developers.google.com
+   - Create a new Project if needed
+   - Credentials > Create Credentials > OAuth Client ID
+   - you should now see something like this, fill it out as shown:
 <div style="border: 1px solid black;">
-<img
-	src="credentials_example.png" alt="screenshot of the create credentials fields"
+  <img
+  src="credentials_example.png" alt="screenshot of the create credentials fields"
 />	
 </div>
-<hr />
-<br />
 
-(You have not actually authorized any application to access your gmail yet, just created the ability to do so on google's end. If you have questions about OAuth access to gmail, see the `FAQ` section.)
+  - Note: You have not actually authorized any application to access your Gmail yet, just created the ability to do so on Google's end. If you have questions about OAuth access to Gmail, see the `FAQ` section.
 
-#### Step Six: `juniordevframework/server/credentials.json` must be created and should look like this:
-
+6. Create `juniordevframework/server/credentials.json` with the following contents:
+    - Note that `server/credentials.json` is ignored by git so that you cannot accidentally commit your credentials
 ```
 {
-	"installed": {
-		"client_secret": "$paste_your_client_secret",
-		"client_id": "$paste_your_client_id", 
-		"redirect_uris": ["http://localhost:3000/api/oauth"]
-	}
+  "installed": {
+    "client_secret": "$paste_your_client_secret",
+    "client_id": "$paste_your_client_id", 
+    "redirect_uris": ["http://localhost:3000/api/oauth"]
+  }
 }
 ```
 
-(note that `server/credentials.json` is ignored by git so that you cannot accidentally commit your credentials)
+7. Shell Commands
+   - be connected to the internet, `docker` will need to pull images on the first run, and the server needs to talk to Google APIs)
+   - `npm install -g @vue/cli`
+   - `make install`
+   - `make db`
+   - `make vue` (runs ui server on 8080)
+   - (in new tab) `make serve` (runs api server on 3000)
 
-#### Step Seven: Shell Commands
-
-(be connected to the internet, `docker` will need to pull images on the first run, and the server needs to talk to google APIs)
-
-- `npm install -g @vue/cli`
-- `make install`
-- `make db`
-- `make vue` (runs ui server on 8080)
-- (in new tab) `make serve` (runs api server on 3000)
-
-#### Step Eight: Load `localhost:8080` in your browser!
+8. Load `http://localhost:8080` in your browser!
 
 ## `make` commands
 
@@ -103,33 +85,29 @@ If you've never used `make` before, think of it like `npm run ...` scripts but n
 
 Some useful commands:
 
-#### `make wake`
+### `make wake`
+ - Run this after startup, starts the postgres && redis containers.
 
-Run this after startup, starts the postgres && redis containers.
+### `make psql`
+- Runs `psql` (the postgres REPL) inside the postgres container so you can write sql queries directly against the db, for testing.
 
-#### `make psql`
+- Exit `psql` with `\q`, try `\x on` to make the query results easier to read
 
-Runs `psql` (the postgres REPL) inside the postgres container so you can write sql queries directly against the db, for testing.
+### `make test`
+- Runs `npm test` in all packages.
 
-(Exit `psql` with `\q`, try `\x on` to make the query results easier to read)
+### `make lint`
+- Runs `npm run lint` in all packages. Also runs as part of the pre-push hook via husky
 
-#### `make test`
+### `make serve[/dev, /mock]`
 
-Runs `npm test` in all packages.
-
-#### `make lint`
-
-Runs `npm run lint` in all packages. Also runs as part of the pre-push hook via husky
-
-#### `make serve[/dev, /mock]`
-
-Starts the server. 
-* `serve/dev` nodemon is used to autorestart the server on code changes.
-* `serve/mock` nodemon + authentication is disabled.
+- Starts the server. 
+  - `serve/dev` nodemon is used to autorestart the server on code changes.
+  - `serve/mock` nodemon + authentication is disabled.
 
 ## FAQ
 
-- Give access to read my email, are you crazy??
+### Q: Give access to read my email, are you crazy??
 
 Yes, I am crazy. Now that's out of the way, I understand why this may be concerning. Keep this in mind: right now, the application only runs on your local machine, and the only db used by the application is also running on your machine. So you have CONTROL over where this data is used. Even better? All the code is open source, so there is no keeping secrets regarding what happens to your data.
 
@@ -137,47 +115,48 @@ Right now, the policy for reading email is this: we may store data about job rel
 
 Further, the project is still just a shadow of its future self, so do keep in mind that even if you give OAuth access, the email scanning code doesn't even exist yet!
 
-- How do I make a Pull Request?
+### Q: How do I make a Pull Request?
 
 That's So Fullstack! Fork this repo, and make a branch on your fork. Make some changes, then create a Pull Request that targets the `master` branch of this main ("upstream") repo.
 
-- Am I too new / junior / inexperienced to contribute to this project?
+### Q: Am I too new / junior / inexperienced to contribute to this project?
 
 NO! Don't let the natural disorientation of a new codebase intimidate you, or imposter syndrome convince you you can't understand this application. _Keep trying_ and raise a Pull Request, any pull request!
 
-- I don't know docker or redis or postgres, what do I do?
+### Q: I don't know docker or redis or postgres, what do I do?
 
 Other than installing docker, you don't need to know much about docker, redis, or postgres at all. Most of the implementation details of these tech is taken care of and abstracted away. Don't let it scare you away!
 
 Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
 
-- I don't know vue.js. How do I learn it?
+### Q: I don't know vue.js. How do I learn it?
 
 I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up. 
 
 Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
 
-- How do I make a Pull Request when I am totally lost?
+### Q: How do I make a Pull Request when I am totally lost?
 
 Don't give up. If open source was easy, everyone would do it. Try focusing on a very small change on the frontend, and committing it. No Pull Request is _too small_.
 
 Alternatively, feel free to watch Pull Requests as they come in. Spending time with the project may make its direction much easier to see!
 
-- I am still hopelessly stuck. How do I get help?
+### Q: I am still hopelessly stuck. How do I get help?
 
 Open an ISSUE! If you can just communicate what you're confused about, that will help us clarify the documentation.
 
-- I read `ROADMAP.md` and am still not sure what is needed next
+### Q: I read `ROADMAP.md` and am still not sure what is needed next
 
 Open an issue and ask for what you need! Pull Requests into `ROADMAP.md` may follow!
 
-- Why vue.js?
+### Q: Why vue.js?
 
 Why not?
 
-- Why sql instead of NoSQL? NoSQL is moar better!
+### Q: Why sql instead of NoSQL? NoSQL is moar better!
 
 I just can't.
+
 
 # Core Contributors
 
