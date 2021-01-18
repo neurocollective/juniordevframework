@@ -199,6 +199,8 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
 
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
+  const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
+  const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
   console.log('allEntities.length', allEntities.length);
 
@@ -217,7 +219,6 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   };
 
   const emailReducer = buildEmailReducer(context);
-
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
   const {
@@ -225,7 +226,11 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     entitiesToCreate = [],
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
-  } = accumulator;
+  } = dbOperationsObject;
+
+  // create entities
+  // create contacts
+  // create job search actions
 
   process.exit(0);
 };
