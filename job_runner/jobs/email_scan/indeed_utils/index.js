@@ -1,5 +1,6 @@
 /* eslint no-multi-spaces: 0 */
 import { JSDOM } from 'jsdom';
+import { getFormattedIdFromName } from '../../../../lib';
 
 const DOC_TYPE_HTML = '<!DOCTYPE html';
 
@@ -16,7 +17,7 @@ const LOCATION_SELECTOR =     `.corner > tbody:nth-child(1) > tr:nth-child(1) > 
   tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(1) > p:nth-child(1) > span:nth-child(2)`;
 
 export const scanIndeedEmail = (rawEmailString = '') => {
-  const indexOfDocType = rawEmailString.indexof(DOC_TYPE_HTML);
+  const indexOfDocType = rawEmailString.indexOf(DOC_TYPE_HTML);
 
   if (indexOfDocType < 0) {
     const msg = `WARNING: indeed email did not start with ${DOC_TYPE_HTML} or has no html`;
@@ -28,7 +29,30 @@ export const scanIndeedEmail = (rawEmailString = '') => {
 
   const { window: { document } } = new JSDOM(htmlOnly);
 
-  return { error: null };
+  const jobTitleNode = document.querySelector(JOB_TITLE_SELECTOR);
+  const entityNameNode = document.querySelector(ENTITIY_NAME_SELECTOR);
+  const locationNode = document.querySelector(LOCATION_SELECTOR);
+
+  let jobTitle, entityName, location;
+
+  if (jobTitleNode && jobTitleNode.innerHTML) {
+    ({ innerHTML: jobTitle } = jobTitleNode);
+  }
+
+  if (entityNameNode && entityNameNode.innerHTML) {
+    ({ innerHTML: entityName } = entityNameNode);
+  }
+
+  if (locationNode && locationNode.innerHTML) {
+    ({ innerHTML: location } = locationNode);
+  }
+
+  return {
+    jobTitle: getFormattedIdFromName(jobTitle),
+    entity: getFormattedIdFromName(entityName),
+    location: getFormattedIdFromName(location),
+    error: null
+  };
 };
 
 // module.exports = {
