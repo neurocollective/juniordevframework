@@ -1,4 +1,4 @@
-/* eslint no-multi-spaces: 0 */
+/* eslint no-multi-spaces: 0 import/prefer-default-export: 0 */
 import { JSDOM } from 'jsdom';
 import { getFormattedIdFromName } from '../../../../lib';
 
@@ -33,7 +33,9 @@ export const scanIndeedEmail = (rawEmailString = '') => {
   const entityNameNode = document.querySelector(ENTITIY_NAME_SELECTOR);
   const locationNode = document.querySelector(LOCATION_SELECTOR);
 
-  let jobTitle, entityName, location;
+  let jobTitle;
+  let entityName;
+  let location;
 
   if (jobTitleNode && jobTitleNode.innerHTML) {
     ({ innerHTML: jobTitle } = jobTitleNode);
