@@ -16,6 +16,8 @@ const LOCATION_SELECTOR =     `.corner > tbody:nth-child(1) > tr:nth-child(1) > 
   table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > table:nth-child(1) >
   tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(1) > p:nth-child(1) > span:nth-child(2)`;
 
+export const INDEED_ERROR_STAMP = 'ERROR_PARSING_INDEED_EMAIL';
+
 export const scanIndeedEmail = (rawEmailString = '') => {
   const indexOfDocType = rawEmailString.indexOf(DOC_TYPE_HTML);
 
@@ -37,23 +39,36 @@ export const scanIndeedEmail = (rawEmailString = '') => {
   let entityName;
   let location;
 
-  if (jobTitleNode && jobTitleNode.innerHTML) {
+  const errors = [];
+  if (jobTitleNode) {
     ({ innerHTML: jobTitle } = jobTitleNode);
+  } else {
+    const error = `${INDEED_ERROR_STAMP} jobTitleNode is falsy! Check JOB_TITLE_SELECTOR?`;
+    console.error(error);
+    errors.push(error);
   }
 
-  if (entityNameNode && entityNameNode.innerHTML) {
+  if (entityNameNode) {
     ({ innerHTML: entityName } = entityNameNode);
+  } else {
+    const error = `${INDEED_ERROR_STAMP} 'entityNameNode is falsy! Check ENTITIY_NAME_SELECTOR?'`;
+    console.error(error);
+    errors.push(error);
   }
 
-  if (locationNode && locationNode.innerHTML) {
+  if (locationNode) {
     ({ innerHTML: location } = locationNode);
+  } else {
+    const error = `${INDEED_ERROR_STAMP} locationNode is falsy! Check LOCATION_SELECTOR?`;
+    console.error(error);
+    errors.push(error);
   }
 
   return {
     jobTitle: getFormattedIdFromName(jobTitle),
     entity: getFormattedIdFromName(entityName),
     location: getFormattedIdFromName(location),
-    error: null
+    errors: errors.length ? errors : null,
   };
 };
 
