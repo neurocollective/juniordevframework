@@ -22,7 +22,6 @@ export const INDEED_ERROR_STAMP = 'ERROR_PARSING_INDEED_EMAIL';
 export const INVALID_EMAIL = 'INVALID EMAIL - CONTINUE APPLYING EMAIL';
 
 export const scanIndeedEmail = (rawEmailString = '', index) => {
-
   if (rawEmailString.includes(USE_THIS_CODE)) {
     const errors = [];
     errors.push(INVALID_EMAIL);
