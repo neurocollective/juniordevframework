@@ -16,9 +16,19 @@ const LOCATION_SELECTOR =     `.corner > tbody:nth-child(1) > tr:nth-child(1) > 
   table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > table:nth-child(1) >
   tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(1) > p:nth-child(1) > span:nth-child(2)`;
 
-export const INDEED_ERROR_STAMP = 'ERROR_PARSING_INDEED_EMAIL';
+const USE_THIS_CODE = 'Use this code to continue applying for Software Engineer';
 
-export const scanIndeedEmail = (rawEmailString = '') => {
+export const INDEED_ERROR_STAMP = 'ERROR_PARSING_INDEED_EMAIL';
+export const INVALID_EMAIL = 'INVALID EMAIL - CONTINUE APPLYING EMAIL';
+
+export const scanIndeedEmail = (rawEmailString = '', index) => {
+
+  if (rawEmailString.includes(USE_THIS_CODE)) {
+    const errors = [];
+    errors.push(INVALID_EMAIL);
+    return { errors };
+  }
+
   const indexOfDocType = rawEmailString.indexOf(DOC_TYPE_HTML);
 
   if (indexOfDocType < 0) {
@@ -44,15 +54,15 @@ export const scanIndeedEmail = (rawEmailString = '') => {
     ({ innerHTML: jobTitle } = jobTitleNode);
   } else {
     const error = `${INDEED_ERROR_STAMP} jobTitleNode is falsy! Check JOB_TITLE_SELECTOR?`;
-    console.error(error);
+    // console.error(error);
     errors.push(error);
   }
 
   if (entityNameNode) {
     ({ innerHTML: entityName } = entityNameNode);
   } else {
-    const error = `${INDEED_ERROR_STAMP} 'entityNameNode is falsy! Check ENTITIY_NAME_SELECTOR?'`;
-    console.error(error);
+    const error = `${INDEED_ERROR_STAMP} entityNameNode is falsy! Check ENTITIY_NAME_SELECTOR?`;
+    // console.error(error);
     errors.push(error);
   }
 
@@ -60,15 +70,24 @@ export const scanIndeedEmail = (rawEmailString = '') => {
     ({ innerHTML: location } = locationNode);
   } else {
     const error = `${INDEED_ERROR_STAMP} locationNode is falsy! Check LOCATION_SELECTOR?`;
-    console.error(error);
+    // console.error(error);
     errors.push(error);
+  }
+
+  const thereAreErrors = Boolean(errors.length);
+
+  if (thereAreErrors) {
+    console.error('errors at index', index, '->');
+    console.error(errors);
+    console.log('RAW STRING:');
+    console.log(rawEmailString);
   }
 
   return {
     jobTitle: getFormattedIdFromName(jobTitle),
     entity: getFormattedIdFromName(entityName),
     location: getFormattedIdFromName(location),
-    errors: errors.length ? errors : null,
+    errors: thereAreErrors ? errors : null,
   };
 };
 

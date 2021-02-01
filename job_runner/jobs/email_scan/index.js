@@ -106,7 +106,7 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
   };
 };
 
-const buildEmailReducer = (context) => (accumulationObject, emailObject) => {
+const buildEmailReducer = (context) => (accumulationObject, emailObject, index) => {
 
   // getFormattedIdFromName is your util for getting ids from company name
 
@@ -130,12 +130,13 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject) => {
     body: emailBody
   } = emailObject;
 
-  if (sentBy === INDEED_APPLICATION_NOTIFY_ADDRESS) {
+  if (sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS)) {
     // it's an indeed application
-    const emailObject = scanIndeedEmail(emailBody);
+    const emailObject = scanIndeedEmail(emailBody, index);
+    console.log('emailObject', emailObject);
     return {
       ...accumulationObject,
-    }
+    };
   }
 
   return {
@@ -206,7 +207,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
 
   console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
-  console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
+  // console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
 
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
