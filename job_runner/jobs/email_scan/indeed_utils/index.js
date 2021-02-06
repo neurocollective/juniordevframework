@@ -21,6 +21,8 @@ const USE_THIS_CODE = 'Use this code to continue applying for Software Engineer'
 export const INDEED_ERROR_STAMP = 'ERROR_PARSING_INDEED_EMAIL';
 export const INVALID_EMAIL = 'INVALID EMAIL - CONTINUE APPLYING EMAIL';
 
+const HERES_WHAT_WE_KNOW = 'Here’s what we know about the';
+
 export const scanIndeedEmail = (rawEmailString = '', index) => {
   if (rawEmailString.includes(USE_THIS_CODE)) {
     const errors = [];
@@ -29,14 +31,23 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
   }
 
   const indexOfDocType = rawEmailString.indexOf(DOC_TYPE_HTML);
+  const indexOfHTML = rawEmailString.indexOf('<html');
 
+  let htmlStartIndex = indexOfDocType;
   if (indexOfDocType < 0) {
-    const msg = `WARNING: indeed email did not start with ${DOC_TYPE_HTML} or has no html`;
-    console.log(msg);
+    htmlStartIndex = indexOfHTML;
+  }
+  if (htmlStartIndex < 0) {
+    const msg = `WARNING: indeed email has no html and is not recognized`;
+    console.log('email body with no html:', rawEmailString);
     return { error: msg };
   }
 
-  const htmlOnly = rawEmailString.slice(indexOfDocType);
+  if (rawEmailString.includes(HERES_WHAT_WE_KNOW)) {
+    return { error: 'ignoring a HERES_WHAT_WE_KNOW email' };  
+  }
+
+  const htmlOnly = rawEmailString.slice(htmlStartIndex); // was `.slice(indexOfDocType)`
 
   const { window: { document } } = new JSDOM(htmlOnly);
 
@@ -53,7 +64,6 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
     ({ innerHTML: jobTitle } = jobTitleNode);
   } else {
     const error = `${INDEED_ERROR_STAMP} jobTitleNode is falsy! Check JOB_TITLE_SELECTOR?`;
-    // console.error(error);
     errors.push(error);
   }
 
@@ -61,7 +71,6 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
     ({ innerHTML: entityName } = entityNameNode);
   } else {
     const error = `${INDEED_ERROR_STAMP} entityNameNode is falsy! Check ENTITIY_NAME_SELECTOR?`;
-    // console.error(error);
     errors.push(error);
   }
 
@@ -69,15 +78,14 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
     ({ innerHTML: location } = locationNode);
   } else {
     const error = `${INDEED_ERROR_STAMP} locationNode is falsy! Check LOCATION_SELECTOR?`;
-    // console.error(error);
     errors.push(error);
   }
-
   const thereAreErrors = Boolean(errors.length);
 
   if (thereAreErrors) {
     console.error('errors at index', index, '->');
     console.error(errors);
+
     console.log('RAW STRING:');
     console.log(rawEmailString);
   }
@@ -89,7 +97,3 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
     errors: thereAreErrors ? errors : null,
   };
 };
-
-// module.exports = {
-//   scanIndeedEmail
-// };
