@@ -40,7 +40,7 @@ const extractDateStringFromReceivedHeader = (str) => {
   return sliced.trim();
 };
 
-const buildEmailFormatMapper = contextObject => ({ response }) => {
+const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
   const {
     TARGET_HEADERS_SET,
     TARGET_MIME_TYPES_SET,
@@ -51,7 +51,10 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
       headers,
       // body,
       parts = []
-    }
+    },
+    id,
+    threadId,
+    snippet,
   } = response;
 
   const relevantHeaders = headers.reduce((headerMap, headerObject) => {
@@ -102,12 +105,16 @@ const buildEmailFormatMapper = contextObject => ({ response }) => {
 
   return {
     headers: relevantHeaders,
-    body: relevantBodyParts.join('')
+    body: relevantBodyParts.join(''),
+    id,
+    threadId,
+    snippet,
   };
 };
 
+// `scanIndeedEmail` and other site-specific scan functions should return this schema:
+// { jobTitle: string, entity: string, location: string, errors: string[] }
 const buildEmailReducer = (context) => (accumulationObject, emailObject, index) => {
-
   // getFormattedIdFromName is your util for getting ids from company name
 
   const {
@@ -120,6 +127,7 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     entitiesToCreate = [],
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
+    unrecognizedEmails = [],
   } = accumulationObject;
   const {
     headers: {
@@ -127,16 +135,36 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
       From: sentBy,
       To: to,
     },
-    body: emailBody
+    body: emailBody,
+    id,
+    threadId,
+    snippet,
   } = emailObject;
 
-  if (sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS)) {
-    // it's an indeed application
+  if (index === 0) {
+    console.log('1st obj of email reducer:', emailObject);
+  }
+
+  const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
+  const isMonster = false;
+  const isLinkedin = false;
+
+  if (isIndeed) {
     const emailObject = scanIndeedEmail(emailBody, index);
-    console.log('emailObject', emailObject);
-    return {
-      ...accumulationObject,
-    };
+    jobSearchActionsToCreate.push({
+      ...emailObject,
+      actionType: 'indeed_application' // TODO- this should be a CONSTANT
+    });
+  } else if (isMonster) {
+    // TODO - implement
+    unrecognizedEmails.push({ id, snippet, threadId });
+  } else if (isLinkedin) {
+    // TODO - implement
+    unrecognizedEmails.push({ id, snippet, threadId });
+  } else {
+    // default behavior: store email id as an unrecognized email, but NOT the email's content
+    // TODO - should the snippet be witheld for privacy reasons?
+    unrecognizedEmails.push({ id, snippet, threadId });
   }
 
   return {
@@ -204,10 +232,8 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     decodeBase64String
   });
 
+  // formattedEmailObjects are being processed for `emailReducer` coming up
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
-
-  console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
-  // console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
 
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
@@ -220,6 +246,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     entitiesToCreate: [],
     contactsToCreate: [],
     jobSearchActionsToCreate: [],
+    unrecognizedEmails: [],
   };
 
   // TODO - get existing contact info for user from DB, insert into context
