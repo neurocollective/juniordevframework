@@ -156,15 +156,15 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
       actionType: 'indeed_application' // TODO- this should be a CONSTANT
     });
   } else if (isMonster) {
-    // TODO - implement
+    // TODO - implement, should not be unrecognized
     unrecognizedEmails.push({ id, snippet, threadId });
   } else if (isLinkedin) {
-    // TODO - implement
+    // TODO - implement, should not be unrecognized
     unrecognizedEmails.push({ id, snippet, threadId });
   } else {
     // default behavior: store email id as an unrecognized email, but NOT the email's content
-    // TODO - should the snippet be witheld for privacy reasons?
-    unrecognizedEmails.push({ id, snippet, threadId });
+    // snippet is witheld for privacy reasons
+    unrecognizedEmails.push({ id, threadId });
   }
 
   return {
@@ -239,6 +239,11 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
+  // TODO - need these next three queries implemented
+  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
+  const { rows: emailsOnEdgeDate } = await pgFunctions.getEmailsOnEdgeDateForUserId(userId);
+  const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
+
   console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
@@ -254,6 +259,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     allEntities,
     allContacts,
     allJobListings,
+    lastEmailScan,
   };
 
   const emailReducer = buildEmailReducer(context);
@@ -273,6 +279,6 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   process.exit(0);
 };
 
-export {
+export default {
   scanEmails
 };
