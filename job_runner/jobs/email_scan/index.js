@@ -1,10 +1,12 @@
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
+import { scanIndeedEmail } from './indeed_utils';
 import {
   refreshToken,
   isTokenExpiredByAPICheck,
   listGmailMessages,
   getGmailMessageById,
   decodeBase64String,
+  getFormattedIdFromName,
   CONSTANTS
 } from '../../../lib';
 
@@ -14,7 +16,8 @@ const {
     TARGET_HEADERS_SET,
     HEADERS: {
       RECEIVED,
-    }
+    },
+    INDEED_APPLICATION_NOTIFY_ADDRESS,
   },
 } = CONSTANTS;
 
@@ -37,21 +40,24 @@ const extractDateStringFromReceivedHeader = (str) => {
   return sliced.trim();
 };
 
-const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
-  // const {
-  //   TARGET_HEADERS_SET,
-  //   TARGET_MIME_TYPES_SET,
-  //   decodeBase64String
-  // } = contextObject;
+const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
+  const {
+    TARGET_HEADERS_SET,
+    TARGET_MIME_TYPES_SET,
+    decodeBase64String
+  } = contextObject;
   const {
     payload: {
       headers,
       // body,
       parts = []
-    }
+    },
+    id,
+    threadId,
+    snippet,
   } = response;
 
-  const relevantHeaders = headers.reduce((headerMap, headerObject /* , index */) => {
+  const relevantHeaders = headers.reduce((headerMap, headerObject) => {
     const { name, value } = headerObject;
 
     // TODO write a helper extractTimeFromReceivedheader to create a new key, 'timeReceived'
@@ -69,6 +75,18 @@ const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
         // const size = value.length;
         // const date = value.slice(semiColonIndex + 1, size).trim();
 
+        /*
+          examples of raw date strings -> 
+          by 2002:a54:2ecc:0:0:0:0:0 with SMTP id m12csp1480132ect;        Thu, 4 Feb 2021 14:54:10 -0800 (PST)
+          from db229.mta.exacttarget.com (db229.mta.exacttarget.com. [13.111.0.229])        by mx.google.com with ESMTPS id 197si3710901qkd.39.2021.02.04.14.54.09        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Thu, 04 Feb 2021 14:54:09 -0800 (PST)
+          by db229.mta.exacttarget.com id h3hth42fmd4p for <johnny@johnnymccodes.com>; Thu, 4 Feb 2021 22:54:09 +0000 (envelope-from <bounce-648_HTML-126963812-4522-7327404-650445@bounce.s7.exacttarget.com>)
+          by 2002:a54:3303:0:0:0:0:0 with SMTP id h3csp30439ecq;        Sun, 17 Jan 2021 00:32:00 -0800 (PST)
+          from mailb-ge.linkedin.com (mailb-ge.linkedin.com. [2620:119:50c0:207::149])        by mx.google.com with ESMTPS id x11si16859789pfp.226.2021.01.17.00.31.59        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 17 Jan 2021 00:31:59 -0800 (PST)
+          by 2002:ab4:a54b:0:0:0:0:0 with SMTP id er11csp1840002ecb;        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+          from mail64.indeed.com (mail64.indeed.com. [198.58.75.64])        by mx.google.com with ESMTPS id z3si8619078oih.94.2021.01.10.10.15.35        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+          from notifications.post.post-mediumpriority-7dff879bf7-j7l8n (aus-smtp1.indeed.net [10.1.3.210]) by mail64.indeed.com (Postfix) with ESMTP id 4DDQ4R4JNJz7RXQ0 for <johnny@johnnymccodes.com>; Sun, 10 Jan 2021 12:15:35 -0600 (CST)
+        */
+        // TODO - update to include hours, minutes, seconds? Ultimately want an epoch value along w/ date
         const dateString = extractDateStringFromReceivedHeader(value);
         // eslint-disable-next-line no-param-reassign
         headerMap.date = dateString;
@@ -99,32 +117,83 @@ const buildEmailFormatMapper = (/* contextObject */) => ({ response }) => {
 
   return {
     headers: relevantHeaders,
-    body: relevantBodyParts.join('')
+    body: relevantBodyParts.join(''),
+    id,
+    threadId,
+    snippet,
   };
 };
 
-const buildEmailReducer = (/* context */) => (accumulationObject /* , emailObject */) => {
-  // const {
-  //   test
-  // } = context;
-  // const {
-  //   testy
-  // } = accumulationObject;
-  // const {
-  //   headers: {
-  //     date,
-  //     From: sentBy,
-  //     To: to,
-  //   },
-  //   body: emailBody
-  // } = emailObject;
+// `scanIndeedEmail` and other site-specific scan functions should return this schema:
+// { jobTitle: string, entity: string, location: string, errors: string[] }
+const buildEmailReducer = (context) => (accumulationObject, emailObject, index) => {
+  // getFormattedIdFromName is your util for getting ids from company name
+
+  const {
+    allEntities = [],
+    allContacts = [],
+    allJobListings = [],
+    lastEmailScan = {},
+    currentUnrecognizedEmails = [],
+  } = context;
+  const {
+    messagesOnEdgeDate = [],
+    entitiesToCreate = [],
+    contactsToCreate = [],
+    jobSearchActionsToCreate = [],
+    unrecognizedEmails = [],
+  } = accumulationObject;
+  const {
+    headers: {
+      date,
+      From: sentBy,
+      To: to,
+    },
+    body: emailBody,
+    id,
+    threadId,
+    snippet,
+  } = emailObject;
+  const {
+    last_email_scan_date: lastScanDateString,
+    last_scan_epoch: lastScanEpoch,
+  } = lastEmailScan;
+
+  if (index === 0) {
+    console.log('1st obj of email reducer:', emailObject);
+  }
+
+  // TODO - check `date` against `lastScanDateString` and `lastScanEpoch`
+  // NOTE - if hour / minutes / seconds were wiped from date, they need to be added back in
+
+  const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
+  const isMonster = false;
+  const isLinkedin = false;
+
+  if (isIndeed) {
+    const emailObject = scanIndeedEmail(emailBody, index);
+    jobSearchActionsToCreate.push({
+      ...emailObject,
+      actionType: 'indeed_application' // TODO- this should be a CONSTANT
+    });
+  } else if (isMonster) {
+    // TODO - implement, should not be unrecognized
+    unrecognizedEmails.push({ id, snippet, threadId });
+  } else if (isLinkedin) {
+    // TODO - implement, should not be unrecognized
+    unrecognizedEmails.push({ id, snippet, threadId });
+  } else {
+    // default behavior: store email id as an unrecognized email, but NOT the email's content
+    // snippet is witheld for privacy reasons
+    unrecognizedEmails.push({ id, threadId });
+  }
 
   return {
     ...accumulationObject
   };
 };
 
-const scanEmails = async (pgFunctions, redisFunctions, userId) => {
+export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
   const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
 
@@ -149,12 +218,18 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
     await pgFunctions.insertRefreshedToken(refreshedToken, userId);
   } else {
+    console.log('token is valid,', token);
     refreshedToken = token;
   }
 
   const { response, error } = await listGmailMessages(refreshedToken);
 
   const { messages } = response;
+
+  if (!messages) {
+    console.log('ERROR, messages is falsy. response:', response);
+    process.exit(1);
+  }
 
   if (error) {
     console.error(error);
@@ -178,41 +253,58 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     decodeBase64String
   });
 
+  // formattedEmailObjects are being processed for `emailReducer` coming up
   const formattedEmailObjects = messageObjects.map(emailFormatMapper);
 
-  console.log('formattedEmailObjects[0].headers: \n', formattedEmailObjects[0].headers);
-  console.log('formattedEmailObjects[0].body: \n', formattedEmailObjects[0].body);
-
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
+  const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
+  const { rows: allJobListings } = await pgFunctions.getAllJobListings();
+
+
+  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);  
+  // TODO - need edge date emails just for emails within X seconds of epoch comparison value 
+  const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
+  const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
 
   console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
     messagesOnEdgeDate: [],
-    newEntities: [],
-    newContacts: [],
-    existingContacts: {}
+    entitiesToCreate: [],
+    contactsToCreate: [],
+    jobSearchActionsToCreate: [],
+    unrecognizedEmails: [],
+    edgeDateEmails: [],
   };
 
   // TODO - get existing contact info for user from DB, insert into context
   const context = {
-    allEntities
+    allEntities,
+    allContacts,
+    allJobListings,
+    lastEmailScan,
+    currentUnrecognizedEmails,
   };
 
   const emailReducer = buildEmailReducer(context);
+  const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
-  /* const dbOperationsObject = */ formattedEmailObjects.reduce(emailReducer, accumulator);
+  const {
+    messagesOnEdgeDate = [],
+    entitiesToCreate = [],
+    contactsToCreate = [],
+    jobSearchActionsToCreate = [],
+  } = dbOperationsObject;
 
-  // const {
-  //   messagesOnEdgeDate = [],
-  //   newEntities = [],
-  //   newContacts = [],
-  //   existingContacts = {}
-  // } = accumulator;
+  // create entities
+  // create contacts
+  // create job search actions
 
   process.exit(0);
 };
 
-export {
-  scanEmails
-};
+// const exportObject = {
+//   scanEmails
+// };
+
+// export default exportObject;
