@@ -121,6 +121,8 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     allEntities = [],
     allContacts = [],
     allJobListings = [],
+    lastEmailScan = {},
+    currentUnrecognizedEmails = [],
   } = context;
   const {
     messagesOnEdgeDate = [],
@@ -140,10 +142,17 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     threadId,
     snippet,
   } = emailObject;
+  const {
+    last_email_scan_date: lastScanDateString,
+    last_scan_epoch: lastScanEpoch,
+  } = lastEmailScan;
 
   if (index === 0) {
     console.log('1st obj of email reducer:', emailObject);
   }
+
+  // TODO - check `date` against `lastScanDateString` and `lastScanEpoch`
+  // NOTE - if hour / minutes / seconds were wiped from date, they need to be added back in
 
   const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
   const isMonster = false;
@@ -241,7 +250,9 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   // TODO - need these next three queries implemented
   const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
-  const { rows: emailsOnEdgeDate } = await pgFunctions.getEmailsOnEdgeDateForUserId(userId);
+  
+  // TODO - don't need this if you store the milliseconds of last scan
+  // const { rows: emailsOnEdgeDate } = await pgFunctions.getEmailsOnEdgeDateForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
 
   console.log('allEntities.length', allEntities.length);
@@ -260,6 +271,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     allContacts,
     allJobListings,
     lastEmailScan,
+    currentUnrecognizedEmails,
   };
 
   const emailReducer = buildEmailReducer(context);
