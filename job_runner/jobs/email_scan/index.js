@@ -75,6 +75,18 @@ const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
         // const size = value.length;
         // const date = value.slice(semiColonIndex + 1, size).trim();
 
+        /*
+          examples of raw date strings -> 
+          by 2002:a54:2ecc:0:0:0:0:0 with SMTP id m12csp1480132ect;        Thu, 4 Feb 2021 14:54:10 -0800 (PST)
+          from db229.mta.exacttarget.com (db229.mta.exacttarget.com. [13.111.0.229])        by mx.google.com with ESMTPS id 197si3710901qkd.39.2021.02.04.14.54.09        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Thu, 04 Feb 2021 14:54:09 -0800 (PST)
+          by db229.mta.exacttarget.com id h3hth42fmd4p for <johnny@johnnymccodes.com>; Thu, 4 Feb 2021 22:54:09 +0000 (envelope-from <bounce-648_HTML-126963812-4522-7327404-650445@bounce.s7.exacttarget.com>)
+          by 2002:a54:3303:0:0:0:0:0 with SMTP id h3csp30439ecq;        Sun, 17 Jan 2021 00:32:00 -0800 (PST)
+          from mailb-ge.linkedin.com (mailb-ge.linkedin.com. [2620:119:50c0:207::149])        by mx.google.com with ESMTPS id x11si16859789pfp.226.2021.01.17.00.31.59        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 17 Jan 2021 00:31:59 -0800 (PST)
+          by 2002:ab4:a54b:0:0:0:0:0 with SMTP id er11csp1840002ecb;        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+          from mail64.indeed.com (mail64.indeed.com. [198.58.75.64])        by mx.google.com with ESMTPS id z3si8619078oih.94.2021.01.10.10.15.35        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+          from notifications.post.post-mediumpriority-7dff879bf7-j7l8n (aus-smtp1.indeed.net [10.1.3.210]) by mail64.indeed.com (Postfix) with ESMTP id 4DDQ4R4JNJz7RXQ0 for <johnny@johnnymccodes.com>; Sun, 10 Jan 2021 12:15:35 -0600 (CST)
+        */
+        // TODO - update to include hours, minutes, seconds? Ultimately want an epoch value along w/ date
         const dateString = extractDateStringFromReceivedHeader(value);
         // eslint-disable-next-line no-param-reassign
         headerMap.date = dateString;
@@ -181,7 +193,7 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
   };
 };
 
-const scanEmails = async (pgFunctions, redisFunctions, userId) => {
+export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
   const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
 
@@ -248,11 +260,10 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
-  // TODO - need these next three queries implemented
-  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
-  
-  // TODO - don't need this if you store the milliseconds of last scan
-  // const { rows: emailsOnEdgeDate } = await pgFunctions.getEmailsOnEdgeDateForUserId(userId);
+
+  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);  
+  // TODO - need edge date emails just for emails within X seconds of epoch comparison value 
+  const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
 
   console.log('allEntities.length', allEntities.length);
@@ -263,6 +274,7 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     contactsToCreate: [],
     jobSearchActionsToCreate: [],
     unrecognizedEmails: [],
+    edgeDateEmails: [],
   };
 
   // TODO - get existing contact info for user from DB, insert into context
@@ -291,6 +303,8 @@ const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   process.exit(0);
 };
 
-export default {
-  scanEmails
-};
+// const exportObject = {
+//   scanEmails
+// };
+
+// export default exportObject;
