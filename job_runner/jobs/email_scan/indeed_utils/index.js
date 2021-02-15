@@ -38,13 +38,13 @@ export const scanIndeedEmail = (rawEmailString = '', index) => {
     htmlStartIndex = indexOfHTML;
   }
   if (htmlStartIndex < 0) {
-    const msg = `WARNING: indeed email has no html and is not recognized`;
+    const msg = 'WARNING: indeed email has no html and is not recognized';
     console.log('email body with no html:', rawEmailString);
     return { error: msg };
   }
 
   if (rawEmailString.includes(HERES_WHAT_WE_KNOW)) {
-    return { error: 'ignoring a HERES_WHAT_WE_KNOW email' };  
+    return { error: 'ignoring a HERES_WHAT_WE_KNOW email' };
   }
 
   const htmlOnly = rawEmailString.slice(htmlStartIndex); // was `.slice(indexOfDocType)`
