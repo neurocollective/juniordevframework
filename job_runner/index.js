@@ -2,7 +2,7 @@ import fs from 'fs';
 import { Client } from 'pg';
 import redis from 'redis';
 
-import {
+import  {
   createUserListings
 } from './jobs/create_user_listings';
 import {
