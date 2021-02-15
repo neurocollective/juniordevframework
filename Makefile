@@ -32,10 +32,10 @@ serve/mock:
 ahab: # This will kill all containers, running or not. DO NOT run this unless you are certain that you need no data in a postgres container!!!
 	bash scripts/ahab.sh
 lint:
-	npm run lint --prefix ./server
-	npm run lint --prefix ./ui
-	npm run lint --prefix ./job_runner
-	npm run lint --prefix ./lib
+	npm run lint:fix --prefix ./server
+	npm run lint:fix --prefix ./ui
+	npm run lint:fix --prefix ./job_runner
+	npm run lint:fix --prefix ./lib
 install:
 	npm i
 	npm i --prefix ./server
