@@ -13,5 +13,6 @@ server/credentials.json
 server/token.json
 server/backup_credentials.json
 server/backup_token.json
+server/gmail.json
 zGitStatus.sh
 zOpenVsCode.sh
