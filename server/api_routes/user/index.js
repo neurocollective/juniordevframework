@@ -46,7 +46,7 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
 
     try {
       const nowEpoch = moment().unix();
-      /* const insertEmailScanRecordQuery = */ await dbFunctions.insertEmailScanRecord(userId, nowEpoch);
+      await dbFunctions.insertEmailScanRecord(userId, nowEpoch);
     } catch (err) {
       console.error('create email scan record query error:', err);
       await dbFunctions.rollbackTransaction();
