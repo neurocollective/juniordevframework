@@ -216,6 +216,11 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     console.log('refreshing token before email scan...');
     refreshedToken = await refreshToken(credentialsObject, token, userId);
 
+    if (!refreshedToken) {
+      console.log('refreshedToken:', refreshedToken);
+      console.error('something wrong with refreshedToken.');
+      return process.exit(1);
+    }
     await pgFunctions.insertRefreshedToken(refreshedToken, userId);
   } else {
     console.log('token is valid,', token);
