@@ -260,8 +260,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
-
-  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);  
+  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
   // TODO - need edge date emails just for emails within X seconds of epoch comparison value 
   const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
