@@ -227,7 +227,14 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     refreshedToken = token;
   }
 
-  const { response, error } = await listGmailMessages(refreshedToken);
+  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
+  const {
+    last_scan_epoch: lastScanEpoch,
+    last_email_scan_date: lastScanString 
+  } = lastEmailScan;
+
+  const date = undefined; // TODO - get date from 
+  const { response, error } = await listGmailMessages(refreshedToken, lastScanString);
 
   const { messages } = response;
 
@@ -265,7 +272,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
-  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
+  // const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
   // TODO - need edge date emails just for emails within X seconds of epoch comparison value 
   const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
@@ -288,6 +295,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     allJobListings,
     lastEmailScan,
     currentUnrecognizedEmails,
+    lastScanEpoch,
   };
 
   const emailReducer = buildEmailReducer(context);
