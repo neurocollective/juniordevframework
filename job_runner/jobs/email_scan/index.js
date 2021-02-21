@@ -1,4 +1,5 @@
 /* eslint-disable */
+import moment from 'moment';
 import { scanIndeedEmail } from './indeed_utils';
 import {
   refreshToken,
@@ -21,12 +22,26 @@ const {
   },
 } = CONSTANTS;
 
+/*
+  examples of raw date strings for `extractDateStringFromReceivedHeader` -> 
+  by 2002:a54:2ecc:0:0:0:0:0 with SMTP id m12csp1480132ect;        Thu, 4 Feb 2021 14:54:10 -0800 (PST)
+  from db229.mta.exacttarget.com (db229.mta.exacttarget.com. [13.111.0.229])        by mx.google.com with ESMTPS id 197si3710901qkd.39.2021.02.04.14.54.09        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Thu, 04 Feb 2021 14:54:09 -0800 (PST)
+  by db229.mta.exacttarget.com id h3hth42fmd4p for <johnny@johnnymccodes.com>; Thu, 4 Feb 2021 22:54:09 +0000 (envelope-from <bounce-648_HTML-126963812-4522-7327404-650445@bounce.s7.exacttarget.com>)
+  by 2002:a54:3303:0:0:0:0:0 with SMTP id h3csp30439ecq;        Sun, 17 Jan 2021 00:32:00 -0800 (PST)
+  from mailb-ge.linkedin.com (mailb-ge.linkedin.com. [2620:119:50c0:207::149])        by mx.google.com with ESMTPS id x11si16859789pfp.226.2021.01.17.00.31.59        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 17 Jan 2021 00:31:59 -0800 (PST)
+  by 2002:ab4:a54b:0:0:0:0:0 with SMTP id er11csp1840002ecb;        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+  from mail64.indeed.com (mail64.indeed.com. [198.58.75.64])        by mx.google.com with ESMTPS id z3si8619078oih.94.2021.01.10.10.15.35        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
+  from notifications.post.post-mediumpriority-7dff879bf7-j7l8n (aus-smtp1.indeed.net [10.1.3.210]) by mail64.indeed.com (Postfix) with ESMTP id 4DDQ4R4JNJz7RXQ0 for <johnny@johnnymccodes.com>; Sun, 10 Jan 2021 12:15:35 -0600 (CST)
+*/
 const extractDateStringFromReceivedHeader = (str) => {
   const semiColonIndex = str.indexOf(';');
   const size = str.length;
   const dateBegin = str.slice(semiColonIndex + 1, size).trim();
 
-  // TODO - does moment.js need the whole string?
+  // dateBegin should look like this: 'Thu, 4 Feb 2021 14:54:10 -0800 (PST)'
+  // `moment` constructor should be able to parse `dateBegin`'s format'
+
+  const epoch = moment(dateBegin);
   const hyphenIndex = dateBegin.indexOf('-');
   const plusIndex = dateBegin.indexOf('+');
 
@@ -37,7 +52,10 @@ const extractDateStringFromReceivedHeader = (str) => {
     sliced = sliced.slice(0, plusIndex);
   }
 
-  return sliced.trim();
+  return {
+    dateString: sliced.trim(),
+    epoch,
+  };
 };
 
 const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
@@ -60,47 +78,21 @@ const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
   const relevantHeaders = headers.reduce((headerMap, headerObject) => {
     const { name, value } = headerObject;
 
-    // TODO write a helper extractTimeFromReceivedheader to create a new key, 'timeReceived'
-    // `string.slice(indexof(';'), string.length).trim()` might work!
-
     if (TARGET_HEADERS_SET.has(name)) {
-      // if (name === RECEIVED) {
-      //   headerMap[`${name}_${index}`] = value;
-      // } else {
-      //   headerMap[name] = value;
-      // }
+      const headerMapCopy = { ...headerMap };
 
       if (name === RECEIVED) {
-        // const semiColonIndex = value.indexOf(';');
-        // const size = value.length;
-        // const date = value.slice(semiColonIndex + 1, size).trim();
-
-        /*
-          examples of raw date strings -> 
-          by 2002:a54:2ecc:0:0:0:0:0 with SMTP id m12csp1480132ect;        Thu, 4 Feb 2021 14:54:10 -0800 (PST)
-          from db229.mta.exacttarget.com (db229.mta.exacttarget.com. [13.111.0.229])        by mx.google.com with ESMTPS id 197si3710901qkd.39.2021.02.04.14.54.09        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Thu, 04 Feb 2021 14:54:09 -0800 (PST)
-          by db229.mta.exacttarget.com id h3hth42fmd4p for <johnny@johnnymccodes.com>; Thu, 4 Feb 2021 22:54:09 +0000 (envelope-from <bounce-648_HTML-126963812-4522-7327404-650445@bounce.s7.exacttarget.com>)
-          by 2002:a54:3303:0:0:0:0:0 with SMTP id h3csp30439ecq;        Sun, 17 Jan 2021 00:32:00 -0800 (PST)
-          from mailb-ge.linkedin.com (mailb-ge.linkedin.com. [2620:119:50c0:207::149])        by mx.google.com with ESMTPS id x11si16859789pfp.226.2021.01.17.00.31.59        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 17 Jan 2021 00:31:59 -0800 (PST)
-          by 2002:ab4:a54b:0:0:0:0:0 with SMTP id er11csp1840002ecb;        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
-          from mail64.indeed.com (mail64.indeed.com. [198.58.75.64])        by mx.google.com with ESMTPS id z3si8619078oih.94.2021.01.10.10.15.35        for <johnny@johnnymccodes.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Sun, 10 Jan 2021 10:15:36 -0800 (PST)
-          from notifications.post.post-mediumpriority-7dff879bf7-j7l8n (aus-smtp1.indeed.net [10.1.3.210]) by mail64.indeed.com (Postfix) with ESMTP id 4DDQ4R4JNJz7RXQ0 for <johnny@johnnymccodes.com>; Sun, 10 Jan 2021 12:15:35 -0600 (CST)
-        */
-        // TODO - update to include hours, minutes, seconds? Ultimately want an epoch value along w/ date
-        const dateString = extractDateStringFromReceivedHeader(value);
-        // eslint-disable-next-line no-param-reassign
-        headerMap.date = dateString;
+        const { dateString, epoch } = extractDateStringFromReceivedHeader(value);
+        headerMapCopy.date = dateString;
+        headerMapCopy.epoch = epoch;
       }
-
-      // eslint-disable-next-line no-param-reassign
-      headerMap[name] = value;
-      return headerMap;
+      headerMapCopy[name] = value;
+      return headerMapCopy;
     }
-
     return headerMap;
   }, {});
 
-  const relevantBodyParts = parts.reduce((list, bodyObject /* , index */) => {
+  const relevantBodyParts = parts.reduce((list, bodyObject) => {
     const { body, mimeType } = bodyObject;
 
     if (!body || !body.data) {
@@ -124,8 +116,11 @@ const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
   };
 };
 
-// `scanIndeedEmail` and other site-specific scan functions should return this schema:
-// { jobTitle: string, entity: string, location: string, errors: string[] }
+// TODO - implement
+const isEmailOnEdgeDate = (emailObject, nowMomentObject) => {
+  return false;
+};
+
 const buildEmailReducer = (context) => (accumulationObject, emailObject, index) => {
   // getFormattedIdFromName is your util for getting ids from company name
 
@@ -135,9 +130,10 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     allJobListings = [],
     lastEmailScan = {},
     currentUnrecognizedEmails = [],
+    now,
   } = context;
   const {
-    messagesOnEdgeDate = [],
+    messagesOnNewEdgeDate = [],
     entitiesToCreate = [],
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
@@ -152,7 +148,7 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     body: emailBody,
     id,
     threadId,
-    snippet,
+    snippet, // TODO - snippet needed? Consider need for snippet vs. potential privacy concerns (if stored).
   } = emailObject;
   const {
     last_email_scan_date: lastScanDateString,
@@ -163,18 +159,25 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
     console.log('1st obj of email reducer:', emailObject);
   }
 
-  // TODO - check `date` against `lastScanDateString` and `lastScanEpoch`
-  // NOTE - if hour / minutes / seconds were wiped from date, they need to be added back in
+  const messagesOnNewEdgeDateCopy = messagesOnNewEdgeDate.slice();
+  const isOnEdgeDate = isEmailOnEdgeDate(emailObject, now);
+
+  if (isOnEdgeDate) {
+    messagesOnNewEdgeDateCopy.push(emailObject);
+  }
 
   const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
-  const isMonster = false;
-  const isLinkedin = false;
+  const isMonster = false; // sentBy.includes(MONSTER_NOTIFY_ADDRESS);
+  const isLinkedin = false; // sentBy.includes(LINKEDIN_NOTIFY_ADDRESS);
 
+
+  // `scanIndeedEmail` and other site-specific scan functions should return this schema:
+  // { jobTitle: string, entity: string, location: string, errors: string[] }
   if (isIndeed) {
-    const emailObject = scanIndeedEmail(emailBody, index);
+    const scannedEmail = scanIndeedEmail(emailBody, index);
     jobSearchActionsToCreate.push({
-      ...emailObject,
-      actionType: 'indeed_application' // TODO- this should be a CONSTANT
+      ...scannedEmail,
+      actionType: 'indeed_application' // TODO - this should be a CONSTANT
     });
   } else if (isMonster) {
     // TODO - implement, should not be unrecognized
@@ -189,7 +192,8 @@ const buildEmailReducer = (context) => (accumulationObject, emailObject, index) 
   }
 
   return {
-    ...accumulationObject
+    ...accumulationObject,
+    messagesOnNewEdgeDate: messagesOnNewEdgeDateCopy,
   };
 };
 
@@ -233,7 +237,6 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     last_email_scan_date: lastScanString 
   } = lastEmailScan;
 
-  const date = undefined; // TODO - get date from 
   const { response, error } = await listGmailMessages(refreshedToken, lastScanString);
 
   const { messages } = response;
@@ -272,7 +275,6 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
-  // const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
   // TODO - need edge date emails just for emails within X seconds of epoch comparison value 
   const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
@@ -280,7 +282,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
-    messagesOnEdgeDate: [],
+    messagesOnNewEdgeDate: [],
     entitiesToCreate: [],
     contactsToCreate: [],
     jobSearchActionsToCreate: [],
@@ -288,7 +290,6 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     edgeDateEmails: [],
   };
 
-  // TODO - get existing contact info for user from DB, insert into context
   const context = {
     allEntities,
     allContacts,
@@ -296,6 +297,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     lastEmailScan,
     currentUnrecognizedEmails,
     lastScanEpoch,
+    lastScanString,
+    now: moment(),
   };
 
   const emailReducer = buildEmailReducer(context);
@@ -312,11 +315,5 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   // create contacts
   // create job search actions
 
-  process.exit(0);
+  // process.exit(0);
 };
-
-// const exportObject = {
-//   scanEmails
-// };
-
-// export default exportObject;

@@ -63,4 +63,6 @@ const main = async () => {
   return 0;
 };
 
-main();
+main()
+.then(() => process.exit(0))
+.catch(() => process.exit(1));
