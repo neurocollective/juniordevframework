@@ -121,82 +121,96 @@ const isEmailOnEdgeDate = (emailObject, nowMomentObject) => {
   return false;
 };
 
-const buildEmailReducer = (context) => (accumulationObject, emailObject, index) => {
-  // getFormattedIdFromName is your util for getting ids from company name
-
+const buildEmailReducer = (context) => {
   const {
     allEntities = [],
     allContacts = [],
     allJobListings = [],
     lastEmailScan = {},
     currentUnrecognizedEmails = [],
+    edgeDateEmails,
     now,
   } = context;
-  const {
-    messagesOnNewEdgeDate = [],
-    entitiesToCreate = [],
-    contactsToCreate = [],
-    jobSearchActionsToCreate = [],
-    unrecognizedEmails = [],
-  } = accumulationObject;
-  const {
-    headers: {
-      date,
-      From: sentBy,
-      To: to,
-    },
-    body: emailBody,
-    id,
-    threadId,
-    snippet, // TODO - snippet needed? Consider need for snippet vs. potential privacy concerns (if stored).
-  } = emailObject;
-  const {
-    last_email_scan_date: lastScanDateString,
-    last_scan_epoch: lastScanEpoch,
-  } = lastEmailScan;
 
-  if (index === 0) {
-    console.log('1st obj of email reducer:', emailObject);
+  const edgeDateEmailIds = edgeDateEmails.map(({ email_id: id }) => id);
+  const edgeDateEmailIdSet = new Set(edgeDateEmailIds);
+
+  return (accumulationObject, emailObject, index) => {
+  // getFormattedIdFromName is your util for getting ids from company name
+
+    const {
+      messagesOnNewEdgeDate = [],
+      entitiesToCreate = [],
+      contactsToCreate = [],
+      jobSearchActionsToCreate = [],
+      unrecognizedEmails = [],
+    } = accumulationObject;
+    const {
+      headers: {
+        date,
+        From: sentBy,
+        To: to,
+      },
+      body: emailBody,
+      id,
+      threadId,
+      snippet, // TODO - snippet needed? Consider need for snippet vs. potential privacy concerns (if stored).
+    } = emailObject;
+    const {
+      last_email_scan_date: lastScanDateString,
+      last_scan_epoch: lastScanEpoch,
+    } = lastEmailScan;
+
+    // skip if scanned last time
+    if (edgeDateEmailIdSet.has(id)) {
+      return accumulationObject;
+    }
+
+    if (index === 0) {
+      console.log('1st obj of email reducer:', emailObject);
+    }
+
+    const messagesOnNewEdgeDateCopy = messagesOnNewEdgeDate.slice();
+    const isOnEdgeDate = isEmailOnEdgeDate(emailObject, now);
+
+    if (isOnEdgeDate) {
+      messagesOnNewEdgeDateCopy.push(emailObject);
+    }
+
+    const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
+    const isMonster = false; // sentBy.includes(MONSTER_NOTIFY_ADDRESS);
+    const isLinkedin = false; // sentBy.includes(LINKEDIN_NOTIFY_ADDRESS);
+
+
+    // `scanIndeedEmail` and other site-specific scan functions should return this schema:
+    // { jobTitle: string, entity: string, location: string, errors: string[] }
+    if (isIndeed) {
+      const scannedEmail = scanIndeedEmail(emailBody, index);
+      jobSearchActionsToCreate.push({
+        ...scannedEmail,
+        actionType: 'indeed_application' // TODO - this should be a CONSTANT
+      });
+    } else if (isMonster) {
+      // TODO - implement, should not be unrecognized
+      unrecognizedEmails.push({ id, snippet, threadId });
+    } else if (isLinkedin) {
+      // TODO - implement, should not be unrecognized
+      unrecognizedEmails.push({ id, snippet, threadId });
+    } else {
+      // default behavior: store email id as an unrecognized email, but NOT the email's content
+      // snippet is witheld for privacy reasons
+      unrecognizedEmails.push({ id, threadId });
+    }
+
+    return {
+      ...accumulationObject,
+      messagesOnNewEdgeDate: messagesOnNewEdgeDateCopy,
+    };
   }
-
-  const messagesOnNewEdgeDateCopy = messagesOnNewEdgeDate.slice();
-  const isOnEdgeDate = isEmailOnEdgeDate(emailObject, now);
-
-  if (isOnEdgeDate) {
-    messagesOnNewEdgeDateCopy.push(emailObject);
-  }
-
-  const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
-  const isMonster = false; // sentBy.includes(MONSTER_NOTIFY_ADDRESS);
-  const isLinkedin = false; // sentBy.includes(LINKEDIN_NOTIFY_ADDRESS);
-
-
-  // `scanIndeedEmail` and other site-specific scan functions should return this schema:
-  // { jobTitle: string, entity: string, location: string, errors: string[] }
-  if (isIndeed) {
-    const scannedEmail = scanIndeedEmail(emailBody, index);
-    jobSearchActionsToCreate.push({
-      ...scannedEmail,
-      actionType: 'indeed_application' // TODO - this should be a CONSTANT
-    });
-  } else if (isMonster) {
-    // TODO - implement, should not be unrecognized
-    unrecognizedEmails.push({ id, snippet, threadId });
-  } else if (isLinkedin) {
-    // TODO - implement, should not be unrecognized
-    unrecognizedEmails.push({ id, snippet, threadId });
-  } else {
-    // default behavior: store email id as an unrecognized email, but NOT the email's content
-    // snippet is witheld for privacy reasons
-    unrecognizedEmails.push({ id, threadId });
-  }
-
-  return {
-    ...accumulationObject,
-    messagesOnNewEdgeDate: messagesOnNewEdgeDateCopy,
-  };
 };
 
+// TODO - how do we handle edge date emails if a scan is run twice in the same day?
+// should the job exit if run same _day_ as last scan?
 export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
   const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
@@ -299,6 +313,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     lastScanEpoch,
     lastScanString,
     now: moment(),
+    edgeDateEmails,
   };
 
   const emailReducer = buildEmailReducer(context);
