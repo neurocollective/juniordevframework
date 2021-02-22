@@ -41,7 +41,15 @@ const extractDateStringFromReceivedHeader = (str) => {
   // dateBegin should look like this: 'Thu, 4 Feb 2021 14:54:10 -0800 (PST)'
   // `moment` constructor should be able to parse `dateBegin`'s format'
 
-  const epoch = moment(dateBegin);
+  let epoch;
+  try {
+    // TODO - moment is logging a warning for some inputs that they do not parse
+    // but but throwing an actual error...
+    epoch = moment(dateBegin).unix();
+  } catch (error) {
+    console.error(`error parsing via moment.js for this string: ${dateBegin}`);
+    console.error('error is', error);
+  }
   const hyphenIndex = dateBegin.indexOf('-');
   const plusIndex = dateBegin.indexOf('+');
 
@@ -161,11 +169,6 @@ const buildEmailReducer = (context) => {
       last_scan_epoch: lastScanEpoch,
     } = lastEmailScan;
 
-    // skip if scanned last time
-    if (edgeDateEmailIdSet.has(id)) {
-      return accumulationObject;
-    }
-
     if (index === 0) {
       console.log('1st obj of email reducer:', emailObject);
     }
@@ -174,6 +177,10 @@ const buildEmailReducer = (context) => {
     const isOnEdgeDate = isEmailOnEdgeDate(emailObject, now);
 
     if (isOnEdgeDate) {
+      // skip if scanned last time
+      if (edgeDateEmailIdSet.has(id)) {
+        return accumulationObject;
+      }
       messagesOnNewEdgeDateCopy.push(emailObject);
     }
 
