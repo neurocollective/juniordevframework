@@ -125,8 +125,12 @@ const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
 };
 
 // TODO - implement
-const isEmailOnEdgeDate = (emailObject, nowMomentObject) => {
-  return false;
+const isEmailOnEdgeDate = (emailObject, lastScanDateString) => {
+  const { date, epoch } = emailObject;
+  // const nowAsDateString = nowMomentObject.format('MM/DD/YYYY');
+
+  const isSameDate = date === lastScanDateString;
+  return isSameDate;
 };
 
 const buildEmailReducer = (context) => {
@@ -147,7 +151,7 @@ const buildEmailReducer = (context) => {
   // getFormattedIdFromName is your util for getting ids from company name
 
     const {
-      messagesOnNewEdgeDate = [],
+      newMessagesOnEdgeDate = [],
       entitiesToCreate = [],
       contactsToCreate = [],
       jobSearchActionsToCreate = [],
@@ -173,15 +177,15 @@ const buildEmailReducer = (context) => {
       console.log('1st obj of email reducer:', emailObject);
     }
 
-    const messagesOnNewEdgeDateCopy = messagesOnNewEdgeDate.slice();
-    const isOnEdgeDate = isEmailOnEdgeDate(emailObject, now);
+    const newMessagesOnEdgeDateCopy = newMessagesOnEdgeDate.slice();
+    const isOnEdgeDate = isEmailOnEdgeDate(emailObject, lastScanDateString);
 
     if (isOnEdgeDate) {
       // skip if scanned last time
       if (edgeDateEmailIdSet.has(id)) {
         return accumulationObject;
       }
-      messagesOnNewEdgeDateCopy.push(emailObject);
+      newMessagesOnEdgeDateCopy.push(emailObject);
     }
 
     const isIndeed = sentBy.includes(INDEED_APPLICATION_NOTIFY_ADDRESS);
@@ -211,7 +215,7 @@ const buildEmailReducer = (context) => {
 
     return {
       ...accumulationObject,
-      messagesOnNewEdgeDate: messagesOnNewEdgeDateCopy,
+      newMessagesOnEdgeDate: newMessagesOnEdgeDateCopy,
     };
   }
 };
@@ -255,7 +259,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
   const {
     last_scan_epoch: lastScanEpoch,
-    last_email_scan_date: lastScanString 
+    last_email_scan_date: lastScanString
   } = lastEmailScan;
 
   const { response, error } = await listGmailMessages(refreshedToken, lastScanString);
@@ -303,7 +307,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
-    messagesOnNewEdgeDate: [],
+    newMessagesOnEdgeDate: [],
     entitiesToCreate: [],
     contactsToCreate: [],
     jobSearchActionsToCreate: [],
@@ -327,15 +331,23 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
   const {
-    messagesOnEdgeDate = [],
+    newMessagesOnEdgeDate = [],
     entitiesToCreate = [],
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
   } = dbOperationsObject;
 
+  // TODO - table edge_date-emails should be wiped if job is NOT being run on same date as last scan.
+  // BUT if the run date is the same as the last scan, then the edge date emails should just be ADDED,
+  // with no wipe of previous records
+
+  // TODO =>
   // create entities
   // create contacts
   // create job search actions
 
-  // process.exit(0);
+  // TODO =>
+  // create domain name mappings to contacts?
+
+  process.exit(0);
 };
