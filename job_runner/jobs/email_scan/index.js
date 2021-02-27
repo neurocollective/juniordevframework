@@ -327,6 +327,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     edgeDateEmails,
   };
 
+  const jobRunningOnSameDayAsLastRun = now.format('MM/DD/YYYY') === lastScanString;
+
   const emailReducer = buildEmailReducer(context);
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
 
@@ -336,6 +338,14 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
   } = dbOperationsObject;
+
+  // TODO - do I need this check? Can I safely delete old edge date emails now that I have epoch values?
+  if (!jobRunningOnSameDayAsLastRun) {
+    // wipe old records in edge_date_emails
+    // then, add `newMessagesOnEdgeDate` to table.
+  }
+
+
 
   // TODO - table edge_date-emails should be wiped if job is NOT being run on same date as last scan.
   // BUT if the run date is the same as the last scan, then the edge date emails should just be ADDED,
