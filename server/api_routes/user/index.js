@@ -31,29 +31,37 @@ const getUserRouter = (dbFunctions, redisFunctions, credentialsObject) => {
       return res.status(500).json({ error: 'Email Required' });
     }
 
-    await dbFunctions.beginTransaction();
-
     let userId;
     try {
-      const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
-      ({ id: userId } = newUser);
-    } catch (err) {
-      console.error('signup error:', err);
-      const failMessage = 'could not create new user';
-      await dbFunctions.rollbackTransaction();
-      return res.status(500).json({ error: failMessage });
+      userId = await dbFunctions.createNewUser(email, firstName, lastName);
+    } catch (error) {
+      console.error('error creating user:', error);
+      return res.status(500).json({ error: error.message });
     }
 
-    try {
-      const nowEpoch = moment().unix();
-      await dbFunctions.insertEmailScanRecord(userId, nowEpoch);
-    } catch (err) {
-      console.error('create email scan record query error:', err);
-      await dbFunctions.rollbackTransaction();
-      return res.status(500).json({ error: err });
-    }
+    // await dbFunctions.beginTransaction();
 
-    await dbFunctions.commitTransaction();
+    // let userId;
+    // try {
+    //   const { rows: [newUser] } = await dbFunctions.insertNewUser(email, firstName, lastName);
+    //   ({ id: userId } = newUser);
+    // } catch (err) {
+    //   console.error('signup error:', err);
+    //   const failMessage = 'could not create new user';
+    //   await dbFunctions.rollbackTransaction();
+    //   return res.status(500).json({ error: failMessage });
+    // }
+
+    // try {
+    //   const nowEpoch = moment().unix();
+    //   await dbFunctions.insertEmailScanRecord(userId, nowEpoch);
+    // } catch (err) {
+    //   console.error('create email scan record query error:', err);
+    //   await dbFunctions.rollbackTransaction();
+    //   return res.status(500).json({ error: err });
+    // }
+
+    // await dbFunctions.commitTransaction();
 
     await createSessionCookie(res, redisFunctions, userId);
 
