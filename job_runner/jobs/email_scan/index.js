@@ -83,37 +83,47 @@ const buildEmailFormatMapper = contextObject => ({ response = {} }) => {
     snippet,
   } = response;
 
-  const relevantHeaders = headers.reduce((headerMap, headerObject) => {
-    const { name, value } = headerObject;
+  let relevantHeaders;
+  try {
+    relevantHeaders = headers.reduce((headerMap, headerObject) => {
+      const { name, value } = headerObject;
 
-    if (TARGET_HEADERS_SET.has(name)) {
-      const headerMapCopy = { ...headerMap };
+      if (TARGET_HEADERS_SET.has(name)) {
+        const headerMapCopy = { ...headerMap };
 
-      if (name === RECEIVED) {
-        const { dateString, epoch } = extractDateStringFromReceivedHeader(value);
-        headerMapCopy.date = dateString;
-        headerMapCopy.epoch = epoch;
+        if (name === RECEIVED) {
+          const { dateString, epoch } = extractDateStringFromReceivedHeader(value);
+          headerMapCopy.date = dateString;
+          headerMapCopy.epoch = epoch;
+        }
+        headerMapCopy[name] = value;
+        return headerMapCopy;
       }
-      headerMapCopy[name] = value;
-      return headerMapCopy;
-    }
-    return headerMap;
-  }, {});
+      return headerMap;
+    }, {});
+  } catch (err) {
+    console.error('error during headers reduce:', error);
+  }
 
-  const relevantBodyParts = parts.reduce((list, bodyObject) => {
-    const { body, mimeType } = bodyObject;
+  let relevantBodyParts;
+  try {
+    relevantBodyParts = parts.reduce((list, bodyObject) => {
+      const { body, mimeType } = bodyObject;
 
-    if (!body || !body.data) {
+      if (!body || !body.data) {
+        return list;
+      }
+
+      if (TARGET_MIME_TYPES_SET.has(mimeType)) {
+        const text = decodeBase64String(body.data);
+        return list.concat([text]);
+      }
+
       return list;
-    }
-
-    if (TARGET_MIME_TYPES_SET.has(mimeType)) {
-      const text = decodeBase64String(body.data);
-      return list.concat([text]);
-    }
-
-    return list;
-  }, []);
+    }, []);
+  } catch (err) {
+    console.error('error during body reduce:', err);
+  }
 
   return {
     headers: relevantHeaders,
@@ -293,8 +303,15 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     decodeBase64String
   });
 
+
+  let formattedEmailObjects;
+  try {
   // formattedEmailObjects are being processed for `emailReducer` coming up
-  const formattedEmailObjects = messageObjects.map(emailFormatMapper);
+    formattedEmailObjects = messageObjects.map(emailFormatMapper);
+  } catch (err) {
+    console.error('scanEmails got an error during messageObjects.map:', err);
+    return process.exit(1);
+  }
 
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
@@ -304,7 +321,6 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   const { rows: edgeDateEmails } = await pgFunctions.getEdgeDateEmailsForUserId(userId);
   const { rows: currentUnrecognizedEmails } = await pgFunctions.getUnrecognizedEmailsForUserId(userId);
 
-  console.log('allEntities.length', allEntities.length);
 
   const accumulator = {
     newMessagesOnEdgeDate: [],
@@ -315,6 +331,9 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     edgeDateEmails: [],
   };
 
+  const now = moment();
+  const jobRunningOnSameDayAsLastRun = now.format('MM/DD/YYYY') === lastScanString;
+
   const context = {
     allEntities,
     allContacts,
@@ -323,11 +342,10 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     currentUnrecognizedEmails,
     lastScanEpoch,
     lastScanString,
-    now: moment(),
+    now,
+    jobRunningOnSameDayAsLastRun,
     edgeDateEmails,
   };
-
-  const jobRunningOnSameDayAsLastRun = now.format('MM/DD/YYYY') === lastScanString;
 
   const emailReducer = buildEmailReducer(context);
   const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
