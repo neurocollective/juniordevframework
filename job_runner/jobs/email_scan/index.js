@@ -154,8 +154,21 @@ const buildEmailScanReducer = (context) => {
     now,
   } = context;
 
+  const entityNames = allEntities.map(({ name }) => name);
+  const entityNameSet = new Set(entityNames);
+
+  // TODO - there should be a `getStructuredId` function to standardize making this
+  // lowercaseName_email string id
+  const contactStructuredIds = allContacts.map(({ name, email }) => (
+    `${name}_${email}`
+  ));
+  const contactIdSet = new Set(contactStructuredIds);
+
   const edgeDateEmailIds = edgeDateEmails.map(({ email_id: id }) => id);
   const edgeDateEmailIdSet = new Set(edgeDateEmailIds);
+
+  const unrecognizedEmailIds = unrecognizedEmails.map(({ email_id: id }) => id);
+  const unrecognizedEmailIdSet = new Set(unrecognizedEmailIds);
 
   return (accumulationObject, emailObject, index) => {
   // getFormattedIdFromName is your util for getting ids from company name
@@ -272,6 +285,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     last_email_scan_date: lastScanString
   } = lastEmailScan;
 
+  console.log('lastEmailScan', lastEmailScan);
+
   const { response, error } = await listGmailMessages(refreshedToken, lastScanString);
 
   const { messages } = response;
@@ -314,6 +329,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   const { rows: allEntities } = await pgFunctions.getAllJobEntities();
+
+  // TODO - jobSearchContact has an EAV table, query it too an nest the data in objects 
   const { rows: allContacts } = await pgFunctions.getAllJobContactsForUserId(userId);
   const { rows: allJobListings } = await pgFunctions.getAllJobListings();
 
@@ -359,6 +376,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   console.log('edgeDateEmails:', edgeDateEmails);
   console.log('newMessagesOnEdgeDate:', newMessagesOnEdgeDate);
+  console.log('entitiesToCreate', entitiesToCreate);
+  console.log('jobSearchActionsToCreate', jobSearchActionsToCreate);
 
   // TODO - do I need this check? Can I safely delete old edge date emails now that I have epoch values?
   if (!jobRunningOnSameDayAsLastRun) {
@@ -379,6 +398,9 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   // TODO =>
   // create domain name mappings to contacts?
+
+  // TODO =>
+  // add last email scan row
 
   process.exit(0);
 };
