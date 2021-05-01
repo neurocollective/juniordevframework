@@ -72,7 +72,16 @@ if (useTLS) {
     key: fs.readFileSync(tlsKeyPath),
     cert: fs.readFileSync(tlsCertPath)
   };
-}
+};
+
+const corsOptions = {
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:3000',
+    'http://192.168.210.236:8080/',
+    'http://192.168.210.236:3000/'
+  ]
+};
 
 const bootServer = async () => {
   const { rows: [credentials] } = await postgresFunctions.getCredentials();
@@ -99,7 +108,7 @@ const bootServer = async () => {
     //   "preflightContinue": false,
     //   "optionsSuccessStatus": 204
     // }
-    const corsOptions = { origin: ['http://localhost:8080', 'http://localhost:3000'] };
+
     const corsMiddleware = cors(corsOptions);
     const corsMiddlewareWithAllowCredentials = (req, res, next) => {
       res.set('Access-Control-Allow-Credentials', 'true'); // required for cross-origin cookie transfer, on client side

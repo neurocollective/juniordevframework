@@ -143,7 +143,7 @@ const isEmailOnEdgeDate = (emailObject, lastScanDateString) => {
   return isSameDate;
 };
 
-const buildEmailReducer = (context) => {
+const buildEmailScanReducer = (context) => {
   const {
     allEntities = [],
     allContacts = [],
@@ -347,8 +347,8 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     edgeDateEmails,
   };
 
-  const emailReducer = buildEmailReducer(context);
-  const dbOperationsObject = formattedEmailObjects.reduce(emailReducer, accumulator);
+  const emailScanReducer = buildEmailScanReducer(context);
+  const dbOperationsObject = formattedEmailObjects.reduce(emailScanReducer, accumulator);
 
   const {
     newMessagesOnEdgeDate = [],
@@ -356,6 +356,9 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     contactsToCreate = [],
     jobSearchActionsToCreate = [],
   } = dbOperationsObject;
+
+  console.log('edgeDateEmails:', edgeDateEmails);
+  console.log('newMessagesOnEdgeDate:', newMessagesOnEdgeDate);
 
   // TODO - do I need this check? Can I safely delete old edge date emails now that I have epoch values?
   if (!jobRunningOnSameDayAsLastRun) {
