@@ -233,8 +233,20 @@ const buildEmailReducer = (context) => {
 // TODO - how do we handle edge date emails if a scan is run twice in the same day?
 // should the job exit if run same _day_ as last scan?
 export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
-  const { rows: [token] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
-  const { rows: [credentialsObject] = [] } = await pgFunctions.getCredentials();
+  console.log('scanEmails is running...');
+
+  let credentialsObject;
+  let token;
+  try {
+    const { rows: [oauthToken] = [] } = await pgFunctions.getOAuthTokenForUserId(userId);
+    token = oauthToken;
+
+    const { rows: [creds] = [] } = await pgFunctions.getCredentials();
+    credentialsObject = creds;
+  } catch (err) {
+    console.log(`error getting credentials: <error>${err.message}</error>`);
+    process.exit(1);
+  }
 
   if (!credentialsObject) {
     console.error('no credentials found in db');
@@ -248,31 +260,55 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
 
   const accessToken = token.access_token;
 
-  const tokenIsExpired = await isTokenExpiredByAPICheck(accessToken);
   let refreshedToken;
+  try {
+    const tokenIsExpired = await isTokenExpiredByAPICheck(accessToken);
 
-  if (tokenIsExpired) {
-    console.log('refreshing token before email scan...');
-    refreshedToken = await refreshToken(credentialsObject, token, userId);
+    if (tokenIsExpired) {
+      console.log('token, expired, refreshing token before email scan...');
+      refreshedToken = await refreshToken(credentialsObject, token, userId);
 
-    if (!refreshedToken) {
-      console.log('refreshedToken:', refreshedToken);
-      console.error('something wrong with refreshedToken.');
-      return process.exit(1);
+      if (!refreshedToken) {
+        console.log('refreshedToken:', refreshedToken);
+        console.error('something wrong with refreshedToken.');
+        return process.exit(1);
+      }
+      await pgFunctions.insertRefreshedToken(refreshedToken, userId);
+    } else {
+      console.log('token is valid,', token);
+      refreshedToken = token;
     }
-    await pgFunctions.insertRefreshedToken(refreshedToken, userId);
-  } else {
-    console.log('token is valid,', token);
-    refreshedToken = token;
+  } catch (error) {
+    console.log(`error running auth validations: <error>${error}</error>`);
   }
 
-  const { rows: [lastEmailScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
+  let lastEmailScan;
+  try {
+    const { rows: [lastScan] } = await pgFunctions.getLastEmailsScanForUserId(userId);
+    lastEmailScan = lastScan;
+  } catch (error) {
+    console.log(`error running getLastEmailsScanForUserId: <error>${error}</error>`);
+  }
+
   const {
     last_scan_epoch: lastScanEpoch,
-    last_email_scan_date: lastScanString
+    last_email_scan_date: lastScanString,
   } = lastEmailScan;
 
-  const { response, error } = await listGmailMessages(refreshedToken, lastScanString);
+
+  console.log(refreshedToken, lastScanString);
+  let response;
+  let error;
+  try {
+    const {
+      response: gmailMessageResponse,
+      error: gmailMessageError
+    } = await listGmailMessages(refreshedToken, lastScanString);
+    response = gmailMessageResponse;
+    error = gmailMessageError;
+  } catch (error) {
+    console.log(`error trying to listGmailMessages: ${error.message}`);
+  }
 
   const { messages } = response;
 
@@ -282,7 +318,7 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
   }
 
   if (error) {
-    console.error(error);
+    console.error(`RUH ROH, error: <error>${error}</error>`);
     process.exit(1);
   }
 
@@ -302,7 +338,6 @@ export const scanEmails = async (pgFunctions, redisFunctions, userId) => {
     TARGET_MIME_TYPES_SET,
     decodeBase64String
   });
-
 
   let formattedEmailObjects;
   try {
