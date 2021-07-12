@@ -167,7 +167,7 @@ const buildEmailScanReducer = (context) => {
   const edgeDateEmailIds = edgeDateEmails.map(({ email_id: id }) => id);
   const edgeDateEmailIdSet = new Set(edgeDateEmailIds);
 
-  const unrecognizedEmailIds = unrecognizedEmails.map(({ email_id: id }) => id);
+  const unrecognizedEmailIds = currentUnrecognizedEmails.map(({ email_id: id }) => id);
   const unrecognizedEmailIdSet = new Set(unrecognizedEmailIds);
 
   return (accumulationObject, emailObject, index) => {
