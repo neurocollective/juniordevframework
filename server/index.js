@@ -72,7 +72,7 @@ if (useTLS) {
     key: fs.readFileSync(tlsKeyPath),
     cert: fs.readFileSync(tlsCertPath)
   };
-};
+}
 
 const corsOptions = {
   origin: [

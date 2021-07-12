@@ -27,9 +27,9 @@ const {
   }
 } = process;
 
-const wait = time => new Promise((resolve, reject) => {
+const wait = (time) => new Promise((resolve, reject) => {
   try {
-     setTimeout(() => resolve(), time);
+    return setTimeout(() => resolve(), time);
   } catch (error) {
     return reject();
   }
@@ -57,7 +57,8 @@ const main = async () => {
 
   const [,, command] = process.argv;
 
-  await wait(1000); // allow db to connect. TODO- use a promise for db connections so this is not necessary?
+  // allow db to connect. TODO- use a promise for db connections so this is not necessary?
+  await wait(1000);
   switch (command) {
     case JOB_COMMAND_CREATE_USER_LISTINGS: {
       return createUserListings(pgFunctions);
