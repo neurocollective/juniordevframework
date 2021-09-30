@@ -6,7 +6,7 @@ An opinionated job-search software suite for new developers. The framework is ba
 
 This section is just for the 'alpha' build period, ending January 2021.
 
-You're joining at the time when you can make the MAXIMUM impact on this project, 
+You're joining at the time when you can make the MAXIMUM impact on this project,
 
 Please keep in mind that this repo is a work in progress, so it needs you to invest - before any code - your interest, patience, and attention. I am just a part-time volunteer, too, and can only contribute so quickly. If this repo is overwhelming, communicate with your collaborators by opening an issue. Let's help each other!
 
@@ -19,7 +19,7 @@ If you need to know more, raise an issue!
 #### Software Dependencies
 
 - `docker`
-- `docker-compose`
+- `docker-compose` -> included with docker
 - `node`
 
 #### Service Dependencies
@@ -29,20 +29,21 @@ If you need to know more, raise an issue!
 
 ## First Time Setup in 8 Steps
 
-#### Step One: Install `make` (windows && linux only, built-in on mac)
+#### Step One: Install `make` (windows && linux only):
 
-windows: `choco install make`
+Mac: built-in on mac, no need to install
 <br />
-linux: `sudo apt-get install build-essential -y`
+Windows: `choco install make`
+<br />
+Linux: `sudo apt-get install build-essential -y`
 
 #### Step Two: Install Node via `nvm` (node version manager):
 
 https://github.com/nvm-sh/nvm
 
-#### Step Three: Install `docker` and `docker-compose`:
+#### Step Three: Install `docker` and `docker-compose` (automatically included with docker):
 
 https://docs.docker.com/desktop/
-https://docs.docker.com/compose/install/
 
 #### Step Four: Clone this repo:
 
@@ -57,6 +58,17 @@ https: `https://github.com/neurocollective/juniordevframework.git`
 - Create a new Project if needed
 
 - credentials > Create Credentials > OAuth Client ID
+
+- if this is your first OAuth Client ID, you will likely have to create your OAuth consent screen. Fill it out as shown below then navigate back to OAuth Client ID screen.
+
+<hr />
+<div style="border: 1px solid black;">
+<img
+	src="oAuth_example.png" alt="screenshot of the OAuth create consent screen fields"
+/>	
+</div>
+<hr />
+<br />
 
 - you should now see something like this, fill it out as shown:
 
@@ -76,13 +88,14 @@ https: `https://github.com/neurocollective/juniordevframework.git`
 ```
 {
 	"installed": {
-		"client_secret": "$paste_your_client_secret",
-		"client_id": "$paste_your_client_id", 
+		"client_secret": "$your_client_secret",
+		"client_id": "$your_client_id",
 		"redirect_uris": ["http://localhost:8080/oauth"]
 	}
 }
 ```
 
+You will want to copy and paste your client_secret and client_id inside the quotes to replace the placeholders.
 (note that `server/credentials.json` is ignored by git so that you cannot accidentally commit your credentials)
 
 #### Step Seven: Shell Commands
@@ -90,10 +103,16 @@ https: `https://github.com/neurocollective/juniordevframework.git`
 (be connected to the internet, `docker` will need to pull images on the first run, and the server needs to talk to google APIs)
 
 - `npm install -g @vue/cli`
+
+Make sure docker is open and running on your computer in order to run these make commands.
+
 - `make install`
 - `make db`
 - `make vue` (runs ui server on 8080)
-- (in new tab) `make serve` (runs api server on 3000)
+
+And in a second terminal tab:
+
+- `make serve` (runs api server on 3000)
 
 #### Step Eight: Load `localhost:8080` in your browser!
 
@@ -147,7 +166,7 @@ Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframew
 
 - I don't know vue.js. How do I learn it?
 
-I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up. 
+I personally think doing is the best way to learn - try tinkering with the code and see if you can get changes to show up.
 
 Check out [GettingStarted.md](https://github.com/neurocollective/juniordevframeworkblob/master/GettingStarted.md) for learning resources.
 
