@@ -74,4 +74,4 @@ const bootstrapRedisFunctions = (client) => {
   };
 };
 
-export { bootstrapRedisFunctions };
+export default { bootstrapRedisFunctions };
